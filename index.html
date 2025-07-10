@@ -20,45 +20,152 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.8/recharts.min.js"></script>
     <script type="text/babel">
+        // Contexto para o aplicativo React, permitindo acesso global a estados e funções.
         const AppContext = React.createContext(null);
+
+        // Provedor de contexto que gerencia o estado global do aplicativo, incluindo Firebase.
         const AppProvider = ({ children }) => {
-          const [db, setDb] = React.useState(null), [auth, setAuth] = React.useState(null), [userId, setUserId] = React.useState(null), [isAuthReady, setIsAuthReady] = React.useState(false), [loading, setLoading] = React.useState(true), [error, setError] = React.useState(null), [currentUser, setCurrentUser] = React.useState(null);
-          const startAudioContext = async () => { if (Tone.context.state !== 'running') { try { await Tone.start(); } catch (e) { console.error("Error resuming Tone.js audio context:", e); } } };
-          React.useEffect(() => {
+          // Estados para Firebase (db, auth, userId, isAuthReady), carregamento, erro e usuário atual.
+          const [db, setDb] = React.useState(null);
+          const [auth, setAuth] = React.useState(null);
+          const [userId, setUserId] = React.useState(null);
+          const [isAuthReady, setIsAuthReady] = React.useState(false);
+          const [loading, setLoading] = React.useState(true);
+          const [error, setError] = React.useState(null);
+          const [currentUser, setCurrentUser] = React.useState(null);
+
+          // Função para iniciar o contexto de áudio do Tone.js, essencial para tocar sons.
+          const startAudioContext = async () => {
+            if (Tone.context.state !== 'running') {
+              try {
+                await Tone.start();
+              } catch (e) {
+                console.error("Erro ao retomar o contexto de áudio do Tone.js:", e);
+              }
+            }
+          };
+
+          // Funções de autenticação (definidas antes do useEffect para garantir escopo)
+          const handleAuthAction = async (action, email, password) => {
             try {
-              const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-              const app = firebase.initializeApp(firebaseConfig), firestoreDb = app.firestore(), firebaseAuth = app.auth();
-              setDb(firestoreDb); setAuth(firebaseAuth);
-              const unsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
-                setCurrentUser(user);
-                if (user) setUserId(user.uid);
-                else {
-                  try {
-                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                    if (initialAuthToken) { await firebaseAuth.signInWithCustomToken(initialAuthToken); setUserId(firebaseAuth.currentUser?.uid); }
-                    else { await firebaseAuth.signInAnonymously(); setUserId(firebaseAuth.currentUser?.uid); }
-                    setCurrentUser(firebaseAuth.currentUser);
-                  } catch (e) { console.error("Erro ao autenticar:", e); setError("Erro ao autenticar. Faça login ou crie uma conta."); setUserId(null); }
-                }
-                setIsAuthReady(true); setLoading(false);
-              });
-              return () => unsubscribe();
-            } catch (e) { console.error("Erro na inicialização do Firebase:", e); setError("Erro na inicialização do aplicativo."); setLoading(false); }
-          }, []);
-          const handleAuthAction = async (action, email, password) => { try { setLoading(true); await (action === 'register' ? auth.createUserWithEmailAndPassword(email, password) : auth.signInWithEmailAndPassword(email, password)); setError(null); } catch (e) { console.error(`Erro no ${action}:`, e); setError(`Erro no ${action}: ` + e.message); } finally { setLoading(false); } };
+              setLoading(true);
+              if (action === 'register') {
+                await auth.createUserWithEmailAndPassword(email, password);
+              } else {
+                await auth.signInWithEmailAndPassword(email, password);
+              }
+              setError(null);
+            } catch (e) {
+              console.error(`Erro no ${action}:`, e);
+              setError(`Erro no ${action}: ` + e.message);
+            } finally {
+              setLoading(false);
+            }
+          };
+
           const handleLogin = (email, password) => handleAuthAction('login', email, password);
           const handleRegister = (email, password) => handleAuthAction('register', email, password);
-          const handleLogout = async () => { try { await auth.signOut(); setUserId(null); setCurrentUser(null); } catch (e) { console.error("Erro ao fazer logout:", e); setError("Erro ao fazer logout: " + e.message); } };
+          const handleLogout = async () => {
+            try {
+              await auth.signOut();
+              setUserId(null);
+              setCurrentUser(null);
+            } catch (e) {
+              console.error("Erro ao fazer logout:", e);
+              setError("Erro ao fazer logout: " + e.message);
+            }
+          };
+
+          // Efeito para inicializar o Firebase e configurar a autenticação.
+          React.useEffect(() => {
+            const initFirebase = async () => {
+              try {
+                // Verifica se o objeto global 'firebase' está disponível.
+                if (typeof window.firebase === 'undefined') {
+                  console.error("Objeto global Firebase não encontrado. Verifique se os SDKs do Firebase estão carregados.");
+                  setError("Erro: Firebase não carregado. Tente recarregar a página.");
+                  setLoading(false);
+                  return;
+                }
+
+                // Tenta analisar a configuração do Firebase, ou usa um objeto vazio se não estiver definida ou for vazia.
+                const firebaseConfig = (typeof __firebase_config === 'string' && __firebase_config.trim() !== '')
+                  ? JSON.parse(__firebase_config)
+                  : {};
+
+                // Inicializa o aplicativo Firebase.
+                const app = window.firebase.initializeApp(firebaseConfig);
+                const firestoreDb = app.firestore();
+                const firebaseAuth = app.auth();
+
+                // Define os estados do Firebase.
+                setDb(firestoreDb);
+                setAuth(firebaseAuth);
+
+                // Listener para mudanças no estado de autenticação do usuário.
+                const unsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
+                  setCurrentUser(user);
+                  if (user) {
+                    setUserId(user.uid); // Define o ID do usuário se logado.
+                  } else {
+                    try {
+                      // Tenta autenticar com token personalizado ou anonimamente.
+                      const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                      if (initialAuthToken) {
+                        await firebaseAuth.signInWithCustomToken(initialAuthToken);
+                        setUserId(firebaseAuth.currentUser?.uid);
+                      } else {
+                        await firebaseAuth.signInAnonymously();
+                        setUserId(firebaseAuth.currentUser?.uid);
+                      }
+                      setCurrentUser(firebaseAuth.currentUser);
+                    } catch (e) {
+                      console.error("Erro ao autenticar:", e);
+                      setError("Erro ao autenticar. Faça login ou crie uma conta.");
+                      setUserId(null);
+                    }
+                  }
+                  setIsAuthReady(true); // Marca a autenticação como pronta.
+                  setLoading(false); // Finaliza o estado de carregamento.
+                });
+                return () => unsubscribe(); // Função de limpeza para o listener.
+              } catch (e) {
+                console.error("Erro na inicialização do Firebase:", e);
+                setError("Erro na inicialização do aplicativo: " + e.message); // Mensagem de erro mais específica.
+                setLoading(false);
+              }
+            };
+
+            initFirebase(); // Chama a função de inicialização do Firebase.
+          }, []); // Array de dependências vazio para rodar apenas uma vez na montagem.
+
+          // Exibe tela de carregamento ou erro.
           if (loading) return (<div className="flex items-center justify-center min-h-screen bg-blue-100 text-blue-800">Carregando aplicativo...</div>);
           if (error) return (<div className="flex items-center justify-center min-h-screen bg-red-100 text-red-800">Erro: {error}</div>);
+
+          // Renderiza os filhos do provedor quando tudo estiver pronto.
           return (<AppContext.Provider value={{ db, auth, userId, isAuthReady, startAudioContext, handleLogin, handleRegister, handleLogout, currentUser }}>{children}</AppContext.Provider>);
         };
+
+        // Hook personalizado para usar o contexto do aplicativo.
         const useAppContext = () => React.useContext(AppContext);
+
+        // Componente de tela de autenticação (Login/Registro).
         const AuthScreen = () => {
           const { handleLogin, handleRegister, loading, error } = useAppContext();
-          const [email, setEmail] = React.useState(''), [password, setPassword] = React.useState(''), [isRegisterMode, setIsRegisterMode] = React.useState(false), [authMessage, setAuthMessage] = React.useState('');
+          const [email, setEmail] = React.useState('');
+          const [password, setPassword] = React.useState('');
+          const [isRegisterMode, setIsRegisterMode] = React.useState(false);
+          const [authMessage, setAuthMessage] = React.useState('');
+
           React.useEffect(() => { setAuthMessage(error || ''); }, [error]);
-          const handleSubmit = async (e) => { e.preventDefault(); setAuthMessage(''); await (isRegisterMode ? handleRegister(email, password) : handleLogin(email, password)); };
+
+          const handleSubmit = async (e) => {
+            e.preventDefault();
+            setAuthMessage('');
+            await (isRegisterMode ? handleRegister(email, password) : handleLogin(email, password));
+          };
+
           return (
             <div className="flex items-center justify-center min-h-screen bg-blue-100 p-2">
               <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-md">
@@ -75,20 +182,36 @@
             </div>
           );
         };
+
+        // Função utilitária para download de arquivos.
         const downloadFile = async (url, filename) => {
           try {
             const res = await fetch(url);
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            const blob = await res.blob(), blobUrl = URL.createObjectURL(blob), a = document.createElement('a');
-            a.href = blobUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            URL.revokeObjectURL(blobUrl); return { success: true };
-          } catch (e) { console.error("Error during download:", e); return { success: false, message: "Erro ao iniciar o download. Tente novamente." }; }
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+            return { success: true };
+          } catch (e) {
+            console.error("Error during download:", e);
+            return { success: false, message: "Erro ao iniciar o download. Tente novamente." };
+          }
         };
+
+        // Componente do título do cabeçalho.
         const HeaderTitle = () => (
           <header className="w-full text-center py-2 bg-blue-700 rounded-b-lg shadow-md">
             <h1 className="text-lg font-bold text-blue-200">Binaural Calm</h1>
           </header>
         );
+
+        // Componente do rodapé de navegação com descrição.
         const FooterNav = () => {
           const { handleLogout, currentUser } = useAppContext();
           return (
@@ -105,6 +228,8 @@
             </footer>
           );
         };
+
+        // Componente da tela inicial (Home).
         const Home = ({ setView }) => {
           const { userId, currentUser } = useAppContext();
           const navItems = [
@@ -133,59 +258,114 @@
             </div>
           );
         };
+
+        // Componente Gerador de Sons Binaurais.
         const BinauralGenerator = () => {
           const { db, userId, isAuthReady, startAudioContext } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-          const [behavior, setBehavior] = React.useState(''), [trigger, setTrigger] = React.useState(''), [frequencyDiff, setFrequencyDiff] = React.useState(5), [baseFrequency, setBaseFrequency] = React.useState(220), [isPlaying, setIsPlaying] = React.useState(false), [player, setPlayer] = React.useState(null), [message, setMessage] = React.useState(''), [userSounds, setUserSounds] = React.useState([]), [editingSound, setEditingSound] = React.useState(null), [showUpgradeModal, setShowUpgradeModal] = React.useState(false), [showPixInfo, setShowPixInfo] = React.useState(false);
+          const [behavior, setBehavior] = React.useState('');
+          const [trigger, setTrigger] = React.useState('');
+          const [frequencyDiff, setFrequencyDiff] = React.useState(5);
+          const [baseFrequency, setBaseFrequency] = React.useState(220);
+          const [isPlaying, setIsPlaying] = React.useState(false);
+          const [player, setPlayer] = React.useState(null);
+          const [message, setMessage] = React.useState('');
+          const [userSounds, setUserSounds] = React.useState([]);
+          const [editingSound, setEditingSound] = React.useState(null);
+          const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
+          const [showPixInfo, setShowPixInfo] = React.useState(false);
+
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const soundsColRef = db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`);
             const unsub = soundsColRef.onSnapshot((snap) => setUserSounds(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))), (e) => { console.error("Erro ao buscar sons binaurais:", e); setMessage("Erro ao carregar seus sons."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
+
           const createBinauralPlayer = (diff, base) => {
-            const masterGain = new Tone.Gain(0.5).toDestination(), filter = new Tone.Filter(8000, "lowpass").connect(masterGain), reverb = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(filter); reverb.generate();
+            const masterGain = new Tone.Gain(0.5).toDestination();
+            const filter = new Tone.Filter(8000, "lowpass").connect(masterGain);
+            const reverb = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(filter);
+            reverb.generate();
             const osc1 = new Tone.Oscillator({ frequency: base, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(reverb);
             const osc2 = new Tone.Oscillator({ frequency: base + diff, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(reverb);
-            setPlayer({ osc1, osc2, masterGain, filter, reverb }); return { osc1, osc2, masterGain, filter, reverb };
+            setPlayer({ osc1, osc2, masterGain, filter, reverb });
+            return { osc1, osc2, masterGain, filter, reverb };
           };
+
           const playSound = async () => {
             await startAudioContext();
             if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); }
-            const newPlayer = createBinauralPlayer(frequencyDiff, baseFrequency); newPlayer.osc1.start(); newPlayer.osc2.start();
-            setIsPlaying(true); setMessage('Som binaural tocando...');
+            const newPlayer = createBinauralPlayer(frequencyDiff, baseFrequency);
+            newPlayer.osc1.start();
+            newPlayer.osc2.start();
+            setIsPlaying(true);
+            setMessage('Som binaural tocando...');
           };
+
           const stopSound = () => {
             if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); setPlayer(null); }
-            setIsPlaying(false); setMessage('Som parado.');
+            setIsPlaying(false);
+            setMessage('Som parado.');
           };
+
           const handleDownloadBinaural = async () => {
             await startAudioContext();
-            const offlineCtx = new Tone.OfflineContext(10, 44100); Tone.setContext(offlineCtx);
-            const mg = new Tone.Gain(0.5).toDestination(), f = new Tone.Filter(8000, "lowpass").connect(mg), r = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(f); r.generate();
+            const offlineCtx = new Tone.OfflineContext(10, 44100);
+            Tone.setContext(offlineCtx);
+            const mg = new Tone.Gain(0.5).toDestination();
+            const f = new Tone.Filter(8000, "lowpass").connect(mg);
+            const r = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(f);
+            r.generate();
             const o1 = new Tone.Oscillator({ frequency: baseFrequency, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(r);
             const o2 = new Tone.Oscillator({ frequency: baseFrequency + frequencyDiff, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(r);
-            o1.start(0); o2.start(0); o1.stop(offlineCtx.duration); o2.stop(offlineCtx.duration);
+            o1.start(0);
+            o2.start(0);
+            o1.stop(offlineCtx.duration);
+            o2.stop(offlineCtx.duration);
             try {
-              const buffer = await offlineCtx.render(), audioBlob = bufferToWave(buffer.getChannelData(0), buffer.length, buffer.sampleRate);
-              const filename = `som_binaural_${baseFrequency}Hz_diff${frequencyDiff}Hz.wav`, res = await downloadFile(URL.createObjectURL(audioBlob), filename);
-              if (res.success) setMessage("Download do som binaural iniciado!"); else alert(res.message);
-            } catch (e) { console.error("Erro ao renderizar ou baixar som binaural:", e); setMessage("Erro ao baixar o som binaural."); }
-            finally { Tone.setContext(Tone.context); mg.dispose(); f.dispose(); r.dispose(); o1.dispose(); o2.dispose(); }
+              const buffer = await offlineCtx.render();
+              const audioBlob = bufferToWave(buffer.getChannelData(0), buffer.length, buffer.sampleRate);
+              const filename = `som_binaural_${baseFrequency}Hz_diff${frequencyDiff}Hz.wav`;
+              const res = await downloadFile(URL.createObjectURL(audioBlob), filename);
+              if (res.success) setMessage("Download do som binaural iniciado!");
+              else alert(res.message);
+            } catch (e) {
+              console.error("Erro ao renderizar ou baixar som binaural:", e);
+              setMessage("Erro ao baixar o som binaural.");
+            } finally {
+              Tone.setContext(Tone.context);
+              mg.dispose();
+              f.dispose();
+              r.dispose();
+              o1.dispose();
+              o2.dispose();
+            }
           };
+
           const bufferToWave = (abuffer, len, sampleRate) => {
-            const nC = 1, l = len * nC * 2 + 44, b = new ArrayBuffer(l), v = new DataView(b); let o = 0;
-            ws(v, o, 'RIFF'); o += 4; v.setUint32(o, 36 + len * nC * 2, true); o += 4;
-            ws(v, o, 'WAVE'); o += 4; ws(v, o, 'fmt '); o += 4;
-            v.setUint32(o, 16, true); o += 4; v.setUint16(o, 1, true); o += 2;
-            v.setUint16(o, nC, true); o += 2; v.setUint32(o, sampleRate, true); o += 4;
-            v.setUint32(o, sampleRate * nC * 2, true); o += 4; v.setUint16(o, nC * 2, true); o += 2;
-            v.setUint16(o, 16, true); o += 2; ws(v, o, 'data'); o += 4;
-            v.setUint32(o, len * nC * 2, true); o += 4; f16BPCM(v, o, abuffer);
+            const nC = 1, l = len * nC * 2 + 44, b = new ArrayBuffer(l), v = new DataView(b);
+            let o = 0;
+            ws(v, o, 'RIFF'); o += 4;
+            v.setUint32(o, 36 + len * nC * 2, true); o += 4;
+            ws(v, o, 'WAVE'); o += 4;
+            ws(v, o, 'fmt '); o += 4;
+            v.setUint32(o, 16, true); o += 4;
+            v.setUint16(o, 1, true); o += 2;
+            v.setUint16(o, nC, true); o += 2;
+            v.setUint32(o, sampleRate, true); o += 4;
+            v.setUint32(o, sampleRate * nC * 2, true); o += 4;
+            v.setUint16(o, nC * 2, true); o += 2;
+            v.setUint16(o, 16, true); o += 2;
+            ws(v, o, 'data'); o += 4;
+            v.setUint32(o, len * nC * 2, true); o += 4;
+            f16BPCM(v, o, abuffer);
             return new Blob([v], { type: 'audio/wav' });
           };
+
           const ws = (v, o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
           const f16BPCM = (o, off, i) => { for (let j = 0; j < i.length; j++, off += 2) { const s = Math.max(-1, Math.min(1, i[j])); o.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true); } };
+
           const handleSaveSound = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!behavior && !trigger) { setMessage("Preencha comportamento ou gatilho."); return; }
@@ -196,13 +376,17 @@
               setBehavior(''); setTrigger('');
             } catch (e) { console.error("Erro ao salvar som:", e); setMessage("Erro ao salvar o som."); }
           };
+
           const handleEditSound = (s) => { setEditingSound(s); setBehavior(s.behavior); setTrigger(s.trigger); setFrequencyDiff(s.frequencyDiff); setBaseFrequency(s.baseFrequency); setMessage("Editando som..."); };
+
           const handleDeleteSound = async (sId) => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             try { await db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`).doc(sId).delete(); setMessage("Som excluído!"); }
             catch (e) { console.error("Erro ao excluir som:", e); setMessage("Erro ao excluir a som."); }
           };
+
           React.useEffect(() => { return () => { if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); } Tone.Transport.stop(); Tone.Transport.cancel(); }; }, [player]);
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Gerador de Sons Binaurais</h2>
@@ -245,11 +429,22 @@
             </div>
           );
         };
+
+        // Componente Rotina Diária.
         const DailyRoutine = () => {
           const { db, userId, isAuthReady } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-          const [morningTasks, setMorningTasks] = React.useState([]), [afternoonTasks, setAfternoonTasks] = React.useState([]), [eveningTasks, setEveningTasks] = React.useState([]), [newTask, setNewTask] = React.useState(''), [newTimeOfDay, setNewTimeOfDay] = React.useState('morning'), [newAlarmTime, setNewAlarmTime] = React.useState(''), [message, setMessage] = React.useState(''), [showAlarmModal, setShowAlarmModal] = React.useState(false), [currentAlarmTask, setCurrentAlarmTask] = React.useState('');
+          const [morningTasks, setMorningTasks] = React.useState([]);
+          const [afternoonTasks, setAfternoonTasks] = React.useState([]);
+          const [eveningTasks, setEveningTasks] = React.useState([]);
+          const [newTask, setNewTask] = React.useState('');
+          const [newTimeOfDay, setNewTimeOfDay] = React.useState('morning');
+          const [newAlarmTime, setNewAlarmTime] = React.useState('');
+          const [message, setMessage] = React.useState('');
+          const [showAlarmModal, setShowAlarmModal] = React.useState(false);
+          const [currentAlarmTask, setCurrentAlarmTask] = React.useState('');
           const alarmIntervalRef = React.useRef(null);
+
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const routineColRef = db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`);
@@ -261,11 +456,14 @@
             }, (e) => { console.error("Erro ao buscar rotina diária:", e); setMessage("Erro ao carregar sua rotina."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
+
           React.useEffect(() => {
             if (!isAuthReady) return;
             if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current);
             alarmIntervalRef.current = setInterval(() => {
-              const now = new Date(), cH = now.getHours(), cM = now.getMinutes();
+              const now = new Date();
+              const cH = now.getHours();
+              const cM = now.getMinutes();
               const checkAndTriggerAlarm = (tasks) => {
                 tasks.forEach(t => {
                   if (t.alarmTime) {
@@ -273,28 +471,35 @@
                     if (cH === aH && cM === aM) {
                       const lastTriggered = localStorage.getItem(`alarm-${t.id}`);
                       if (!lastTriggered || (now.getTime() - parseInt(lastTriggered, 10) > 60000)) {
-                        setCurrentAlarmTask(t.task); setShowAlarmModal(true); localStorage.setItem(`alarm-${t.id}`, now.getTime().toString());
+                        setCurrentAlarmTask(t.task);
+                        setShowAlarmModal(true);
+                        localStorage.setItem(`alarm-${t.id}`, now.getTime().toString());
                         new Tone.Synth().toDestination().triggerAttackRelease("C5", "8n");
                       }
                     }
                   }
                 });
               };
-              checkAndTriggerAlarm(morningTasks); checkAndTriggerAlarm(afternoonTasks); checkAndTriggerAlarm(eveningTasks);
+              checkAndTriggerAlarm(morningTasks);
+              checkAndTriggerAlarm(afternoonTasks);
+              checkAndTriggerAlarm(eveningTasks);
             }, 5000);
             return () => { if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current); };
           }, [morningTasks, afternoonTasks, eveningTasks, isAuthReady]);
+
           const handleAddTask = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!newTask.trim()) { setMessage("A tarefa não pode estar vazia."); return; }
             try { await db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`).add({ task: newTask, timeOfDay: newTimeOfDay, alarmTime: newAlarmTime || null, timestamp: new Date().toISOString() }); setNewTask(''); setNewAlarmTime(''); setMessage("Tarefa adicionada!"); }
             catch (e) { console.error("Erro ao adicionar tarefa:", e); setMessage("Erro ao adicionar a tarefa."); }
           };
+
           const handleDeleteTask = async (tId) => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             try { await db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`).doc(tId).delete(); setMessage("Tarefa excluída!"); }
             catch (e) { console.error("Erro ao excluir tarefa:", e); setMessage("Erro ao excluir a tarefa."); }
           };
+
           const renderTaskList = (tasks, title) => (
             <div className="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm">
               <h3 className="text-base sm:text-lg font-semibold text-blue-700 mb-1">{title}</h3>
@@ -308,6 +513,7 @@
               )}
             </div>
           );
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Rotina Diária</h2>
@@ -325,12 +531,15 @@
                 {message && <p className="text-center text-xs text-gray-600 mt-1">{message}</p>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3">
-                {renderTaskList(morningTasks, 'Manhã')}{renderTaskList(afternoonTasks, 'Tarde')}{renderTaskList(eveningTasks, 'Noite')}
+                {renderTaskList(morningTasks, 'Manhã')}
+                {renderTaskList(afternoonTasks, 'Tarde')}
+                {renderTaskList(eveningTasks, 'Noite')}
               </div>
               {showAlarmModal && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-2">
                   <div className="bg-white p-4 sm:p-5 rounded-lg shadow-xl text-center w-full max-w-xs mx-auto">
-                    <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">ALARM!</h3><p className="text-sm text-gray-800 mb-3">Hora de: <span className="font-semibold">{currentAlarmTask}</span></p>
+                    <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">ALARM!</h3>
+                    <p className="text-sm text-gray-800 mb-3">Hora de: <span className="font-semibold">{currentAlarmTask}</span></p>
                     <button onClick={() => setShowAlarmModal(false)} className="px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button>
                   </div>
                 </div>
@@ -338,10 +547,14 @@
             </div>
           );
         };
+
+        // Componente Gráfico de Progresso Mensal.
         const MonthlyProgressChart = () => {
           const { db, userId, isAuthReady } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-          const [crisisData, setCrisisData] = React.useState([]), [message, setMessage] = React.useState('');
+          const [crisisData, setCrisisData] = React.useState([]);
+          const [message, setMessage] = React.useState('');
+
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const assessmentsColRef = db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`);
@@ -350,16 +563,20 @@
               const monthlyData = {};
               assessments.forEach(a => {
                 if (a.crisisLevel !== undefined && a.crisisLevel !== null) {
-                  const date = new Date(a.timestamp), mY = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                  const date = new Date(a.timestamp);
+                  const mY = `${date.getFullYear()}-${date.getMonth() + 1}`;
                   monthlyData[mY] = monthlyData[mY] || { month: date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' }), totalCrises: 0, count: 0 };
-                  monthlyData[mY].totalCrises += a.crisisLevel; monthlyData[mY].count++;
+                  monthlyData[mY].totalCrises += a.crisisLevel;
+                  monthlyData[mY].count++;
                 }
               });
               const chartData = Object.keys(monthlyData).map(k => ({ name: monthlyData[k].month, "Nível Médio de Crise": monthlyData[k].totalCrises / monthlyData[k].count })).sort((a, b) => new Date(`1 ${a.name}`) - new Date(`1 ${b.name}`));
-              setCrisisData(chartData); setMessage(chartData.length === 0 ? "Nenhum dado de crise registrado ainda para gerar o gráfico." : "");
+              setCrisisData(chartData);
+              setMessage(chartData.length === 0 ? "Nenhum dado de crise registrado ainda para gerar o gráfico." : "");
             }, (e) => { console.error("Erro ao buscar dados de crise:", e); setMessage("Erro ao carregar dados de crise para o gráfico."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg mt-3">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Evolução Mensal das Crises</h2>
@@ -368,48 +585,71 @@
               {crisisData.length > 0 && (
                 <Recharts.ResponsiveContainer width="100%" height={200}>
                   <Recharts.LineChart data={crisisData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                    <Recharts.CartesianGrid strokeDasharray="3 3" /><Recharts.XAxis dataKey="name" tick={{fontSize: 8}} /><Recharts.YAxis domain={[0, 5]} tick={{fontSize: 8}} />
-                    <Recharts.Tooltip /><Recharts.Legend wrapperStyle={{fontSize: '10px'}} /><Recharts.Line type="monotone" dataKey="Nível Médio de Crise" stroke="#8884d8" activeDot={{ r: 6 }} />
+                    <Recharts.CartesianGrid strokeDasharray="3 3" />
+                    <Recharts.XAxis dataKey="name" tick={{fontSize: 8}} />
+                    <Recharts.YAxis domain={[0, 5]} tick={{fontSize: 8}} />
+                    <Recharts.Tooltip />
+                    <Recharts.Legend wrapperStyle={{fontSize: '10px'}} />
+                    <Recharts.Line type="monotone" dataKey="Nível Médio de Crise" stroke="#8884d8" activeDot={{ r: 6 }} />
                   </Recharts.LineChart>
                 </Recharts.ResponsiveContainer>
               )}
             </div>
           );
         };
+
+        // Componente Autoavaliação.
         const SelfAssessment = () => {
           const { db, userId, isAuthReady } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-          const [assessmentText, setAssessmentText] = React.useState(''), [crisisLevel, setCrisisLevel] = React.useState(3), [assessments, setAssessments] = React.useState([]), [message, setMessage] = React.useState('');
+          const [assessmentText, setAssessmentText] = React.useState('');
+          const [crisisLevel, setCrisisLevel] = React.useState(3);
+          const [assessments, setAssessments] = React.useState([]);
+          const [message, setMessage] = React.useState('');
+
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const assessmentsColRef = db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`);
             const unsub = assessmentsColRef.onSnapshot((snap) => {
               const assessmentsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-              assessmentsData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); setAssessments(assessmentsData);
+              assessmentsData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+              setAssessments(assessmentsData);
             }, (e) => { console.error("Erro ao buscar autoavaliações:", e); setMessage("Erro ao carregar suas autoavaliações."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
+
           const handleSaveAssessment = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!assessmentText.trim()) { setMessage("A autoavaliação não pode estar vazia."); return; }
             try {
               const newAssessment = { text: assessmentText, crisisLevel: crisisLevel, timestamp: new Date().toISOString() };
               await db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`).add(newAssessment);
-              const today = new Date(), cMY = `${today.getFullYear()}-${today.getMonth() + 1}`;
+              const today = new Date();
+              const cMY = `${today.getFullYear()}-${today.getMonth() + 1}`;
               const monthlySummaryRef = db.collection(`artifacts/${appId}/users/${userId}/monthlySummaries`).doc(cMY);
               const docSnap = await monthlySummaryRef.get();
-              let tCL = newAssessment.crisisLevel, aC = 1;
-              if (docSnap.exists) { const d = docSnap.data(); tCL += d.totalCrisisLevel || 0; aC += d.assessmentCount || 0; }
+              let tCL = newAssessment.crisisLevel;
+              let aC = 1;
+              if (docSnap.exists) {
+                const d = docSnap.data();
+                tCL += d.totalCrisisLevel || 0;
+                aC += d.assessmentCount || 0;
+              }
               await monthlySummaryRef.set({ totalCrisisLevel: tCL, assessmentCount: aC, averageCrisisLevel: tCL / aC, lastUpdated: new Date().toISOString() }, { merge: true });
-              setAssessmentText(''); setCrisisLevel(3); setMessage("Autoavaliação salva!");
+              setAssessmentText('');
+              setCrisisLevel(3);
+              setMessage("Autoavaliação salva!");
             } catch (e) { console.error("Erro ao salvar autoavaliação:", e); setMessage("Erro ao salvar a autoavaliação."); }
           };
+
           const handleDeleteAssessment = async (aId) => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             try { await db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`).doc(aId).delete(); setMessage("Autoavaliação excluída!"); }
             catch (e) { console.error("Erro ao excluir autoavaliação:", e); setMessage("Erro ao excluir a autoavaliação."); }
           };
+
           const formatDate = (iso) => new Date(iso).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Autoavaliação</h2>
@@ -434,6 +674,8 @@
             </div>
           );
         };
+
+        // Componente Biblioteca de Sons.
         const SoundLibrary = () => {
           const { startAudioContext } = useAppContext();
           const [isPlaying, setIsPlaying] = React.useState(null);
@@ -450,53 +692,121 @@
             { id: 'sh_song9', name: 'Música 9', description: 'Tranquilidade sonora.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+9', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
             { id: 'sh_song10', name: 'Música 10', description: 'Sinfonia calma.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+10', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
           ];
-          const playSound = async (s) => { await startAudioContext(); stopCurrentSound(); try { const p = new Tone.Player(s.audioUrl).toDestination(); p.autostart = true; p.loop = true; p.volume.value = -10; currentPlayerRef.current = p; setIsPlaying(s.id); } catch (e) { console.error("Error playing sound:", e); } };
-          const stopCurrentSound = () => { if (currentPlayerRef.current) { currentPlayerRef.current.stop(); currentPlayerRef.current.dispose(); currentPlayerRef.current = null; } setIsPlaying(null); Tone.Transport.stop(); Tone.Transport.cancel(); };
-          React.useEffect(() => { return () => stopCurrentSound(); }, []);
+
+          const playSound = async (s) => {
+            await startAudioContext();
+            stopCurrentSound(); // Para qualquer som que esteja tocando.
+            try {
+              const p = new Tone.Player(s.audioUrl).toDestination();
+              p.autostart = true;
+              p.loop = true;
+              p.volume.value = -10; // Volume um pouco mais baixo.
+              currentPlayerRef.current = p;
+              setIsPlaying(s.id);
+            } catch (e) {
+              console.error("Error playing sound:", e);
+            }
+          };
+
+          const stopCurrentSound = () => {
+            if (currentPlayerRef.current) {
+              currentPlayerRef.current.stop();
+              currentPlayerRef.current.dispose();
+              currentPlayerRef.current = null;
+            }
+            setIsPlaying(null);
+            Tone.Transport.stop(); // Garante que o transporte do Tone.js também pare.
+            Tone.Transport.cancel(); // Cancela eventos agendados.
+          };
+
+          React.useEffect(() => {
+            return () => stopCurrentSound(); // Garante que o som pare ao desmontar o componente.
+          }, []);
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Biblioteca de Sons Instrumentais</h2>
               <p className="text-xs sm:text-sm text-gray-700 mb-3">Explore uma variedade de sons instrumentais para promover o relaxamento e o bem-estar.</p>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                {sounds.map(s => (<div key={s.id} className="bg-blue-50 p-2 rounded-lg shadow-md flex flex-col items-center text-center">
-                  <img src={s.image} alt={``} className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-2 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/80x80/CCCCCC/000?text=Erro`; }} />
-                  <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-1">{s.name}</h3><p className="text-xs text-gray-700 mb-2">{s.description}</p>
-                  <div className="flex flex-col gap-1 w-full">
-                    <button onClick={() => isPlaying === s.id ? stopCurrentSound() : playSound(s)} className={`px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 ${isPlaying === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>{isPlaying === s.id ? 'Parar' : 'Tocar'}</button>
-                    <a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center justify-center">Ouvir</a>
-                    <button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 bg-purple-600 hover:bg-purple-700 text-white inline-flex items-center justify-center">Download</button>
+                {sounds.map(s => (
+                  <div key={s.id} className="bg-blue-50 p-2 rounded-lg shadow-md flex flex-col items-center text-center">
+                    <img src={s.image} alt={``} className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-2 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/80x80/CCCCCC/000?text=Erro`; }} />
+                    <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-1">{s.name}</h3>
+                    <p className="text-xs text-gray-700 mb-2">{s.description}</p>
+                    <div className="flex flex-col gap-1 w-full">
+                      <button onClick={() => isPlaying === s.id ? stopCurrentSound() : playSound(s)} className={`px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 ${isPlaying === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>{isPlaying === s.id ? 'Parar' : 'Tocar'}</button>
+                      <a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center justify-center">Ouvir</a>
+                      <button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 bg-purple-600 hover:bg-purple-700 text-white inline-flex items-center justify-center">Download</button>
+                    </div>
                   </div>
-                </div>))}
+                ))}
               </div>
             </div>
           );
         };
+
+        // Componente Playlist do Usuário.
         const UserPlaylist = () => {
           const { db, userId, isAuthReady, startAudioContext } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-          const [playlistSongs, setPlaylistSongs] = React.useState([]), [newSongName, setNewSongName] = React.useState(''), [newCoverImage, setNewCoverImage] = React.useState(''), [newAudioUrl, setNewAudioUrl] = React.useState(''), [message, setMessage] = React.useState(''), [isPlaylistUnlocked, setIsPlaylistUnlocked] = React.useState(false), [currentPlayingSong, setCurrentPlayingSong] = React.useState(null);
+          const [playlistSongs, setPlaylistSongs] = React.useState([]);
+          const [newSongName, setNewSongName] = React.useState('');
+          const [newCoverImage, setNewCoverImage] = React.useState('');
+          const [newAudioUrl, setNewAudioUrl] = React.useState('');
+          const [message, setMessage] = React.useState('');
+          const [isPlaylistUnlocked, setIsPlaylistUnlocked] = React.useState(false);
+          const [currentPlayingSong, setCurrentPlayingSong] = React.useState(null);
           const playerRef = React.useRef(null);
-          const MAX_PLAYLIST_SONGS = 10, CRISIS_LEVEL_GOAL = 2.0;
+          const MAX_PLAYLIST_SONGS = 10;
+          const CRISIS_LEVEL_GOAL = 2.0; // Nível médio de crise para desbloquear a playlist.
+
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const playlistColRef = db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`);
             const unsubPlaylist = playlistColRef.onSnapshot((snap) => setPlaylistSongs(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))), (e) => { console.error("Erro ao buscar playlist:", e); setMessage("Erro ao carregar sua playlist."); });
+
+            // Função para verificar se a playlist está desbloqueada.
             const checkPlaylistUnlock = async () => {
-              const today = new Date(), pM = today.getMonth() === 0 ? 12 : today.getMonth(), pY = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
-              const pMY = `${pY}-${pM}`;
+              const today = new Date();
+              // Mês e ano anteriores para verificar a média de crise.
+              const pM = today.getMonth() === 0 ? 12 : today.getMonth(); // Se for janeiro (0), pega dezembro (12) do ano anterior.
+              const pY = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+              const pMY = `${pY}-${pM}`; // Formato YYYY-MM
+
               const monthlySummaryRef = db.collection(`artifacts/${appId}/users/${userId}/monthlySummaries`).doc(pMY);
               try {
                 const docSnap = await monthlySummaryRef.get();
                 if (docSnap.exists) {
                   const d = docSnap.data();
-                  if (d.averageCrisisLevel !== undefined && d.averageCrisisLevel <= CRISIS_LEVEL_GOAL) { setIsPlaylistUnlocked(true); setMessage("Sua playlist está desbloqueada! Parabéns pela sua evolução!"); }
-                  else { setIsPlaylistUnlocked(false); setMessage(`Sua playlist está bloqueada. Média de crise do mês anterior: ${d.averageCrisisLevel.toFixed(1)}. Meta: ${CRISIS_LEVEL_GOAL}.`); }
-                } else { setIsPlaylistUnlocked(false); setMessage("Sua playlist está bloqueada. Registre autoavaliações para acompanhar seu progresso e desbloquear!"); }
-              } catch (e) { console.error("Erro ao verificar meta mensal:", e); setMessage("Erro ao verificar meta mensal para a playlist."); setIsPlaylistUnlocked(false); }
+                  if (d.averageCrisisLevel !== undefined && d.averageCrisisLevel <= CRISIS_LEVEL_GOAL) {
+                    setIsPlaylistUnlocked(true);
+                    setMessage("Sua playlist está desbloqueada! Parabéns pela sua evolução!");
+                  } else {
+                    setIsPlaylistUnlocked(false);
+                    setMessage(`Sua playlist está bloqueada. Média de crise do mês anterior: ${d.averageCrisisLevel.toFixed(1)}. Meta: ${CRISIS_LEVEL_GOAL}.`);
+                  }
+                } else {
+                  setIsPlaylistUnlocked(false);
+                  setMessage("Sua playlist está bloqueada. Registre autoavaliações para acompanhar seu progresso e desbloquear!");
+                }
+              } catch (e) {
+                console.error("Erro ao verificar meta mensal:", e);
+                setMessage("Erro ao verificar meta mensal para a playlist.");
+                setIsPlaylistUnlocked(false);
+              }
             };
-            checkPlaylistUnlock();
-            return () => { unsubPlaylist(); if (playerRef.current) { playerRef.current.stop(); playerRef.current.dispose(); playerRef.current = null; } };
+            checkPlaylistUnlock(); // Chama a função ao montar o componente.
+
+            return () => {
+              unsubPlaylist(); // Limpa o listener da playlist.
+              if (playerRef.current) { // Para qualquer música tocando ao desmontar.
+                playerRef.current.stop();
+                playerRef.current.dispose();
+                playerRef.current = null;
+              }
+            };
           }, [db, userId, isAuthReady, appId]);
+
           const handleAddSong = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!isPlaylistUnlocked) { setMessage("A playlist está bloqueada. Alcance a meta mensal para desbloquear!"); return; }
@@ -505,18 +815,43 @@
             try { await db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`).add({ name: newSongName, coverImage: newCoverImage || 'https://placehold.co/100x100/CCCCCC/000?text=Sem+Capa', audioUrl: newAudioUrl || '', timestamp: new Date().toISOString() }); setNewSongName(''); setNewCoverImage(''); setNewAudioUrl(''); setMessage("Música adicionada à playlist!"); }
             catch (e) { console.error("Erro ao adicionar música:", e); setMessage("Erro ao adicionar a música."); }
           };
+
           const handleDeleteSong = async (sId) => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
-            try { if (currentPlayingSong && currentPlayingSong.id === sId) stopPlayingSong(); await db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`).doc(sId).delete(); setMessage("Música excluída da playlist!"); }
-            catch (e) { console.error("Erro ao excluir música:", e); setMessage("Erro ao excluir a música."); }
+            try {
+              if (currentPlayingSong && currentPlayingSong.id === sId) stopPlayingSong(); // Para a música se ela estiver tocando.
+              await db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`).doc(sId).delete();
+              setMessage("Música excluída da playlist!");
+            } catch (e) { console.error("Erro ao excluir música:", e); setMessage("Erro ao excluir a música."); }
           };
+
           const playSong = async (s) => {
-            await startAudioContext(); stopPlayingSong();
+            await startAudioContext();
+            stopPlayingSong(); // Para qualquer música anterior.
             if (!s.audioUrl || s.audioUrl.trim() === '') { setMessage("Esta música não tem uma URL de áudio válida para tocar. Por favor, edite-a e adicione uma URL de áudio hospedada."); return; }
-            try { playerRef.current = new Tone.Player(s.audioUrl).toDestination(); playerRef.current.autostart = true; playerRef.current.loop = true; playerRef.current.volume.value = -10; setCurrentPlayingSong(s); setMessage(`Tocando: ${s.name}`); }
-            catch (e) { console.error("Erro ao tocar música:", e); setMessage(`Erro ao tocar ${s.name}. Verifique a URL do áudio.`); }
+            try {
+              playerRef.current = new Tone.Player(s.audioUrl).toDestination();
+              playerRef.current.autostart = true;
+              playerRef.current.loop = true;
+              playerRef.current.volume.value = -10;
+              setCurrentPlayingSong(s);
+              setMessage(`Tocando: ${s.name}`);
+            } catch (e) {
+              console.error("Erro ao tocar música:", e);
+              setMessage(`Erro ao tocar ${s.name}. Verifique a URL do áudio.`);
+            }
           };
-          const stopPlayingSong = () => { if (playerRef.current) { playerRef.current.stop(); playerRef.current.dispose(); playerRef.current = null; } setCurrentPlayingSong(null); setMessage('Música parada.'); };
+
+          const stopPlayingSong = () => {
+            if (playerRef.current) {
+              playerRef.current.stop();
+              playerRef.current.dispose();
+              playerRef.current = null;
+            }
+            setCurrentPlayingSong(null);
+            setMessage('Música parada.');
+          };
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Minha Playlist Favorita</h2>
@@ -535,19 +870,29 @@
               <h3 className="text-base sm:text-lg font-bold text-blue-700 mb-1">Minhas Músicas</h3>
               {playlistSongs.length === 0 ? (<p className="text-xs text-gray-600">Nenhuma música na playlist ainda.</p>) : (
                 <ul className="space-y-1.5">
-                  {playlistSongs.map(s => (<li key={s.id} className="bg-blue-50 p-2 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                    <div className="flex items-center gap-2"><img src={s.coverImage} alt={``} className="w-10 h-10 sm:w-12 sm:h-12 rounded-md object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/48x48/CCCCCC/000?text=Capa`; }} /><div><p className="font-semibold text-blue-800 text-xs sm:text-sm">{s.name}</p><p className="text-xs text-gray-500">Adicionado: {new Date(s.timestamp).toLocaleDateString('pt-BR')}</p></div></div>
-                    <div className="flex gap-1 mt-1 sm:mt-0">
-                      <button onClick={() => currentPlayingSong && currentPlayingSong.id === s.id ? stopPlayingSong() : playSong(s)} className={`px-1.5 py-0.5 text-xs rounded-md font-bold transition duration-300 ${currentPlayingSong && currentPlayingSong.id === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}>{currentPlayingSong && currentPlayingSong.id === s.id ? 'Parar' : 'Tocar'}</button>
-                      {s.audioUrl && s.audioUrl.trim() !== '' && (<><a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-1.5 py-0.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Ouvir</a><button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-1.5 py-0.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Download</button></>)}
-                      <button onClick={() => handleDeleteSong(s.id)} className="px-1.5 py-0.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300">Excluir</button>
-                    </div>
-                  </li>))}
+                  {playlistSongs.map(s => (
+                    <li key={s.id} className="bg-blue-50 p-2 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                      <div className="flex items-center gap-2">
+                        <img src={s.coverImage} alt={``} className="w-10 h-10 sm:w-12 sm:h-12 rounded-md object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/48x48/CCCCCC/000?text=Capa`; }} />
+                        <div>
+                          <p className="font-semibold text-blue-800 text-xs sm:text-sm">{s.name}</p>
+                          <p className="text-xs text-gray-500">Adicionado: {new Date(s.timestamp).toLocaleDateString('pt-BR')}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-1 mt-1 sm:mt-0">
+                        <button onClick={() => currentPlayingSong && currentPlayingSong.id === s.id ? stopPlayingSong() : playSong(s)} className={`px-1.5 py-0.5 text-xs rounded-md font-bold transition duration-300 ${currentPlayingSong && currentPlayingSong.id === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}>{currentPlayingSong && currentPlayingSong.id === s.id ? 'Parar' : 'Tocar'}</button>
+                        {s.audioUrl && s.audioUrl.trim() !== '' && (<><a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-1.5 py-0.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Ouvir</a><button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-1.5 py-0.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Download</button></>)}
+                        <button onClick={() => handleDeleteSong(s.id)} className="px-1.5 py-0.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300">Excluir</button>
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
           );
         };
+
+        // Componente Melhoria da Comunicação.
         const CommunicationImprovement = () => {
           const tips = [
             { title: "Direto e Claro", description: "Use linguagem simples, evite sarcasmo ou metáforas." },
@@ -564,18 +909,29 @@
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Melhorar Comunicação</h2>
               <p className="text-xs sm:text-sm text-gray-700 mb-3">Dicas e estratégias para promover uma comunicação mais eficaz e compreensiva.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-                {tips.map((t, i) => (<div key={i} className="bg-blue-50 p-2 rounded-lg shadow-md">
-                  <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-1">{t.title}</h3><p className="text-xs text-gray-700">{t.description}</p>
-                </div>))}
+                {tips.map((t, i) => (
+                  <div key={i} className="bg-blue-50 p-2 rounded-lg shadow-md">
+                    <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-1">{t.title}</h3>
+                    <p className="text-xs text-gray-700">{t.description}</p>
+                  </div>
+                ))}
               </div>
             </div>
           );
         };
+
+        // Componente Ajuda da IA.
         const AIHelper = () => {
-          const [difficulty, setDifficulty] = React.useState(''), [youtubeLinks, setYoutubeLinks] = React.useState([]), [loading, setLoading] = React.useState(false), [message, setMessage] = React.useState('');
+          const [difficulty, setDifficulty] = React.useState('');
+          const [youtubeLinks, setYoutubeLinks] = React.useState([]);
+          const [loading, setLoading] = React.useState(false);
+          const [message, setMessage] = React.useState('');
+
           const generateAndFetchLinks = async () => {
             if (!difficulty.trim()) { setMessage("Descreva sua dificuldade para a IA ajudar."); return; }
-            setLoading(true); setMessage("Gerando sugestões de vídeos..."); setYoutubeLinks([]);
+            setLoading(true);
+            setMessage("Gerando sugestões de vídeos...");
+            setYoutubeLinks([]);
             try {
               const prompt = `Gere 3 termos de busca para o YouTube que ajudem uma pessoa com autismo a lidar com a seguinte dificuldade: "${difficulty}". Os termos devem ser focados em atividades ou exercícios práticos. Responda em formato JSON com uma chave "queries" que contém um array de strings.`;
               const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { "queries": { type: "ARRAY", items: { type: "STRING" } } }, propertyOrdering: ["queries"] } } };
@@ -588,9 +944,14 @@
                   setMessage("Aqui estão algumas sugestões de vídeos do YouTube:");
                 } else { setMessage("A IA não conseguiu gerar termos de busca relevantes."); }
               } else { setMessage("Erro ao processar a resposta da IA."); }
-            } catch (e) { console.error("Erro ao gerar links do YouTube:", e); setMessage("Erro ao gerar sugestões. Tente novamente."); }
-            finally { setLoading(false); }
+            } catch (e) {
+              console.error("Erro ao gerar links do YouTube:", e);
+              setMessage("Erro ao gerar sugestões. Tente novamente.");
+            } finally {
+              setLoading(false);
+            }
           };
+
           return (
             <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
               <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Ajuda da Inteligência Artificial ✨</h2>
@@ -602,13 +963,16 @@
             </div>
           );
         };
+
+        // Componente principal do aplicativo.
         const App = () => {
-          const [view, setView] = React.useState('home');
+          const [view, setView] = React.useState('home'); // Estado para controlar a visualização atual.
+
           return (
             <AppProvider>
               <div className="min-h-screen bg-blue-100 p-2 flex flex-col items-center">
-                <HeaderTitle />
-                <main className="mt-2 w-full max-w-full sm:max-w-4xl pb-16">
+                <HeaderTitle /> {/* Cabeçalho com o título do app. */}
+                <main className="mt-2 w-full max-w-full sm:max-w-4xl pb-16"> {/* Conteúdo principal com padding para o rodapé. */}
                   {view === 'home' && <Home setView={setView} />}
                   {view === 'binaural' && <BinauralGenerator />}
                   {view === 'routine' && <DailyRoutine />}
@@ -618,11 +982,13 @@
                   {view === 'communication' && <CommunicationImprovement />}
                   {view === 'aiHelper' && <AIHelper />}
                 </main>
-                <FooterNav />
+                <FooterNav /> {/* Rodapé de navegação. */}
               </div>
             </AppProvider>
           );
         };
+
+        // Renderiza o componente principal na div 'root'.
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
