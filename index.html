@@ -3,41 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicativo Binaural para Autismo</title>
+    <title>Binaural Calm</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Manifest.json embutido -->
-    <link rel="manifest" href="data:application/json;base64,eyJvbmFtZSI6IkFwcCBkZSBTb25zIEJpbmF1cmFpcyIsInNob3J0X25hbWUiOiJTb25zIEJpbmF1cmFpcyIsImRlc2NyaXB0aW9uIjoiQXBsaWNhdGl2byBwYXJhIGdlcmFyIHNvbnMgYmluYXVyYWlzIGUgb2F4aWxpYXIgbm8gYXV0aXNtby4iLCJzdGFydF91cmwiOi4iLCJkaXNwbGF5IjoidXNlci1pbnN0YWxsYWJsZSIsImJhY2tncm91bmRfY29sb3IiOiIjZWZmNmZmIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzE5MngxOTIvNDc0N0ZGL0ZGRkZGRj90ZXh0PUFwcCIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzUxMng1MTIvNDc0N0ZGL0ZGRkZGRj90ZXh0PUFwcCIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <link rel="manifest" href="data:application/json;base64,eyJvbmFtZSI6IkFwcCBkZSBTb25zIEJpbmF1cmFpcyIsInNob3J0X25hbWUiOiJTb25zIEJpbmF1cmFpcyIsImRlc2NyaXB0aW9uIjoiQXBsaWNhdGl2byBwYXJhIGdlcmVyIHNvbnMgYmluYXVyYWlzIGUgb2F4aWxpYXIgbm8gYXV0aXNtby4iLCJzdGFydF91cmwiOi4iLCJkaXNwbGF5IjoidXNlci1pbnN0YWxsYWJsZSIsImJhY2tncm91bmRfY29sb3IiOiIjZWZmNmZmIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzE5MngxOTIvNDc0N0ZGL0ZGRkZGRj90ZXh0PUFwcCIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzUxMng1MTIvNDc0N0ZGL0ZGRkZGRj90ZXh0PUFwcCIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-blue-100">
     <div id="root"></div>
-
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    <!-- Firebase v8 CDN Links -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.1.8/recharts.min.js"></script>
     <script type="text/babel">
         const AppContext = React.createContext(null);
-
         const AppProvider = ({ children }) => {
           const [db, setDb] = React.useState(null), [auth, setAuth] = React.useState(null), [userId, setUserId] = React.useState(null), [isAuthReady, setIsAuthReady] = React.useState(false), [loading, setLoading] = React.useState(true), [error, setError] = React.useState(null), [currentUser, setCurrentUser] = React.useState(null);
-
           const startAudioContext = async () => { if (Tone.context.state !== 'running') { try { await Tone.start(); } catch (e) { console.error("Error resuming Tone.js audio context:", e); } } };
-
           React.useEffect(() => {
             try {
               const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-              const app = firebase.initializeApp(firebaseConfig);
-              const firestoreDb = app.firestore();
-              const firebaseAuth = app.auth();
+              const app = firebase.initializeApp(firebaseConfig), firestoreDb = app.firestore(), firebaseAuth = app.auth();
               setDb(firestoreDb); setAuth(firebaseAuth);
               const unsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
                 setCurrentUser(user);
@@ -55,41 +45,36 @@
               return () => unsubscribe();
             } catch (e) { console.error("Erro na inicialização do Firebase:", e); setError("Erro na inicialização do aplicativo."); setLoading(false); }
           }, []);
-
           const handleAuthAction = async (action, email, password) => { try { setLoading(true); await (action === 'register' ? auth.createUserWithEmailAndPassword(email, password) : auth.signInWithEmailAndPassword(email, password)); setError(null); } catch (e) { console.error(`Erro no ${action}:`, e); setError(`Erro no ${action}: ` + e.message); } finally { setLoading(false); } };
           const handleLogin = (email, password) => handleAuthAction('login', email, password);
           const handleRegister = (email, password) => handleAuthAction('register', email, password);
           const handleLogout = async () => { try { await auth.signOut(); setUserId(null); setCurrentUser(null); } catch (e) { console.error("Erro ao fazer logout:", e); setError("Erro ao fazer logout: " + e.message); } };
-
           if (loading) return (<div className="flex items-center justify-center min-h-screen bg-blue-100 text-blue-800">Carregando aplicativo...</div>);
           if (error) return (<div className="flex items-center justify-center min-h-screen bg-red-100 text-red-800">Erro: {error}</div>);
           return (<AppContext.Provider value={{ db, auth, userId, isAuthReady, startAudioContext, handleLogin, handleRegister, handleLogout, currentUser }}>{children}</AppContext.Provider>);
         };
-
         const useAppContext = () => React.useContext(AppContext);
-
         const AuthScreen = () => {
           const { handleLogin, handleRegister, loading, error } = useAppContext();
           const [email, setEmail] = React.useState(''), [password, setPassword] = React.useState(''), [isRegisterMode, setIsRegisterMode] = React.useState(false), [authMessage, setAuthMessage] = React.useState('');
           React.useEffect(() => { setAuthMessage(error || ''); }, [error]);
           const handleSubmit = async (e) => { e.preventDefault(); setAuthMessage(''); await (isRegisterMode ? handleRegister(email, password) : handleLogin(email, password)); };
           return (
-            <div className="flex items-center justify-center min-h-screen bg-blue-100 p-4">
-              <div className="bg-white p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-sm sm:max-w-md">
-                <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-4 sm:mb-6 text-center">{isRegisterMode ? 'Criar Conta' : 'Fazer Login'}</h2>
-                <p className="text-sm sm:text-base text-gray-700 text-center mb-4 sm:mb-6">{isRegisterMode ? 'Crie uma conta para salvar suas configurações e progresso.' : 'Faça login para acessar o aplicativo.'}</p>
+            <div className="flex items-center justify-center min-h-screen bg-blue-100 p-2">
+              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-md">
+                <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 text-center">{isRegisterMode ? 'Criar Conta' : 'Fazer Login'}</h2>
+                <p className="text-xs sm:text-sm text-gray-700 text-center mb-3">{isRegisterMode ? 'Crie uma conta para salvar suas configurações e progresso.' : 'Faça login para acessar o aplicativo.'}</p>
                 <form onSubmit={handleSubmit}>
-                  <div className="mb-3 sm:mb-4"><label htmlFor="email" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Email:</label><input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" required className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm" /></div>
-                  <div className="mb-4 sm:mb-6"><label htmlFor="password" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Senha:</label><input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" required className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 mb-2 sm:mb-3 leading-tight focus:outline-none focus:shadow-outline text-sm" /></div>
-                  {authMessage && <p className="text-red-500 text-xs sm:text-sm text-center mb-3 sm:mb-4">{authMessage}</p>}
-                  <button type="submit" disabled={loading} className={`w-full px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300`}>{loading ? 'Carregando...' : (isRegisterMode ? 'Registrar' : 'Entrar')}</button>
+                  <div className="mb-2"><label htmlFor="email" className="block text-gray-700 text-xs font-bold mb-1">Email:</label><input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" required className="shadow border rounded w-full py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" /></div>
+                  <div className="mb-3"><label htmlFor="password" className="block text-gray-700 text-xs font-bold mb-1">Senha:</label><input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" required className="shadow border rounded w-full py-1 px-2 text-gray-700 mb-1 focus:outline-none focus:shadow-outline text-xs" /></div>
+                  {authMessage && <p className="text-red-500 text-xs text-center mb-2">{authMessage}</p>}
+                  <button type="submit" disabled={loading} className={`w-full px-3 py-1.5 bg-blue-600 text-white text-sm font-bold rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300`}>{loading ? 'Carregando...' : (isRegisterMode ? 'Registrar' : 'Entrar')}</button>
                 </form>
-                <div className="mt-4 sm:mt-6 text-center"><button onClick={() => setIsRegisterMode(!isRegisterMode)} className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-semibold transition duration-300">{isRegisterMode ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Crie uma'}</button></div>
+                <div className="mt-3 text-center"><button onClick={() => setIsRegisterMode(!isRegisterMode)} className="text-blue-600 hover:text-blue-800 text-xs font-semibold transition duration-300">{isRegisterMode ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Crie uma'}</button></div>
               </div>
             </div>
           );
         };
-
         const downloadFile = async (url, filename) => {
           try {
             const res = await fetch(url);
@@ -99,52 +84,71 @@
             URL.revokeObjectURL(blobUrl); return { success: true };
           } catch (e) { console.error("Error during download:", e); return { success: false, message: "Erro ao iniciar o download. Tente novamente." }; }
         };
-
-        const Header = ({ setView }) => {
+        const HeaderTitle = () => (
+          <header className="w-full text-center py-2 bg-blue-700 rounded-b-lg shadow-md">
+            <h1 className="text-lg font-bold text-blue-200">Binaural Calm</h1>
+          </header>
+        );
+        const FooterNav = () => {
           const { handleLogout, currentUser } = useAppContext();
           return (
-            <header className="bg-blue-700 text-white p-2 sm:p-3 shadow-md rounded-b-lg w-full">
-              <nav className="flex flex-wrap justify-center gap-2 sm:gap-3">
-                {['home', 'binaural', 'routine', 'selfAssessment', 'soundLibrary', 'userPlaylist', 'communication', 'aiHelper'].map(v => (
-                  <button key={v} onClick={() => setView(v)} className="px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm bg-blue-800 hover:bg-blue-900 rounded-md sm:rounded-lg transition duration-300">{v === 'home' ? 'Início' : v === 'binaural' ? 'Gerador Binaural' : v === 'routine' ? 'Rotina Diária' : v === 'selfAssessment' ? 'Autoavaliação' : v === 'soundLibrary' ? 'Biblioteca de Sons' : v === 'userPlaylist' ? 'Minha Playlist' : v === 'communication' ? 'Melhorar Comunicação' : 'Ajuda da IA'}</button>
-                ))}
-                {currentUser && (<button onClick={handleLogout} className="px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm bg-red-700 hover:bg-red-800 rounded-md sm:rounded-lg transition duration-300">Sair</button>)}
-              </nav>
-            </header>
+            <footer className="fixed bottom-0 left-0 w-full bg-blue-700 text-white p-2 shadow-lg z-50 flex justify-between items-center">
+              <p className="text-xs text-blue-200 text-center flex-grow">
+                Binaural Calm: Sons para foco e tranquilidade.
+              </p>
+              {currentUser && (
+                <button onClick={handleLogout} className="flex flex-col items-center justify-center text-xs text-white hover:text-red-200 transition duration-300 p-1 ml-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H9" /></svg>
+                  <span className="mt-0.5">Sair</span>
+                </button>
+              )}
+            </footer>
           );
         };
-
-        const Home = () => {
+        const Home = ({ setView }) => {
           const { userId, currentUser } = useAppContext();
+          const navItems = [
+            { id: 'binaural', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9.006 17.5c-2.795 1.543-3.45 4.002-1.779 5.689 1.671 1.688 4.129 1.032 5.672-1.766l.708-1.284m-.531-9.07l1.284-.707c2.795-1.543 3.45-4.002 1.779-5.689-1.671-1.688-4.129-1.032-5.672 1.766L7.99 4.5M14.009 10.406L9.009 15.406m5.004-5L19 10.406m-5 0l-5 5" /></svg>), label: 'Gerador' },
+            { id: 'routine', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12v-.008zM12 18h.008v.008H12v-.008z" /></svg>), label: 'Rotina' },
+            { id: 'selfAssessment', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>), label: 'Avaliação' },
+            { id: 'soundLibrary', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25H21M7.5 12H3m0 0l3-3m-3 3l3 3m0 0h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25H21" /></svg>), label: 'Biblioteca' },
+            { id: 'userPlaylist', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.835 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>), label: 'Playlist' },
+            { id: 'communication', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.515C20.25 14.636 15.136 19.75 9 19.75c-1.89 0-3.68-.48-5.25-1.325L3 21l2.25-2.25c1.194.39 2.476.605 3.75.605 6.136 0 11.25-5.114 11.25-11.25S15.136 3 9 3 3 8.114 3 14.25z" /></svg>), label: 'Comunicação' },
+            { id: 'aiHelper', icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 mx-auto mb-1"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 6a6 6 0 01-6-6v-1.5m6 6v3.75m-3.75 0h7.5M12 10.5V3.75m-3.75 0h7.5M12 10.5h.008v.008H12v-.008zM12 18.75h.008v.008H12v-.008z" /></svg>), label: 'IA' },
+          ];
           return (
-            <div className="p-4 sm:p-6 text-center bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-3xl font-bold text-blue-700 mb-2 sm:mb-4">Bem-vindo ao App de Sons Binaurais!</h2>
-              <p className="text-sm sm:text-lg text-gray-700 mb-4 sm:mb-6">Este aplicativo foi desenvolvido para ajudar a criar um ambiente sonoro calmante e estruturado. Explore as seções para gerar sons personalizados, organizar sua rotina e acompanhar seu bem-estar.</p>
-              {userId && (<p className="text-xs sm:text-sm text-gray-500">Seu ID de Usuário: <span className="font-mono break-all">{userId}</span></p>)}
-              {currentUser && currentUser.email && (<p className="text-xs sm:text-sm text-gray-500">Logado como: <span className="font-mono break-all">{currentUser.email}</span></p>)}
+            <div className="p-3 sm:p-4 text-center bg-gradient-to-br from-blue-900 to-blue-700 rounded-lg shadow-lg flex flex-col items-center justify-center min-h-[calc(100vh-120px)] text-white">
+              <h2 className="text-2xl sm:text-3xl font-bold text-blue-200 mb-4">Binaural Calm</h2>
+              <p className="text-sm sm:text-base text-blue-100 mb-6">Seu guia para tranquilidade e bem-estar.</p>
+              <div className="grid grid-cols-3 gap-4 sm:gap-6 max-w-md mx-auto">
+                {navItems.map(item => (
+                  <button key={item.id} onClick={() => setView(item.id)} className="flex flex-col items-center justify-center bg-white bg-opacity-20 hover:bg-opacity-30 p-3 rounded-full shadow-lg transition duration-300 text-blue-100">
+                    {item.icon}
+                    <span className="mt-1 text-xs font-semibold">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+              {userId && (<p className="text-xs text-blue-300 mt-6">Seu ID de Usuário: <span className="font-mono break-all">{userId}</span></p>)}
+              {currentUser && currentUser.email && (<p className="text-xs text-blue-300">Logado como: <span className="font-mono break-all">{currentUser.email}</span></p>)}
             </div>
           );
         };
-
         const BinauralGenerator = () => {
           const { db, userId, isAuthReady, startAudioContext } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
           const [behavior, setBehavior] = React.useState(''), [trigger, setTrigger] = React.useState(''), [frequencyDiff, setFrequencyDiff] = React.useState(5), [baseFrequency, setBaseFrequency] = React.useState(220), [isPlaying, setIsPlaying] = React.useState(false), [player, setPlayer] = React.useState(null), [message, setMessage] = React.useState(''), [userSounds, setUserSounds] = React.useState([]), [editingSound, setEditingSound] = React.useState(null), [showUpgradeModal, setShowUpgradeModal] = React.useState(false), [showPixInfo, setShowPixInfo] = React.useState(false);
-
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const soundsColRef = db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`);
             const unsub = soundsColRef.onSnapshot((snap) => setUserSounds(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))), (e) => { console.error("Erro ao buscar sons binaurais:", e); setMessage("Erro ao carregar seus sons."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
-
           const createBinauralPlayer = (diff, base) => {
             const masterGain = new Tone.Gain(0.5).toDestination(), filter = new Tone.Filter(8000, "lowpass").connect(masterGain), reverb = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(filter); reverb.generate();
             const osc1 = new Tone.Oscillator({ frequency: base, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(reverb);
             const osc2 = new Tone.Oscillator({ frequency: base + diff, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(reverb);
             setPlayer({ osc1, osc2, masterGain, filter, reverb }); return { osc1, osc2, masterGain, filter, reverb };
           };
-
           const playSound = async () => {
             await startAudioContext();
             if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); }
@@ -169,7 +173,6 @@
             } catch (e) { console.error("Erro ao renderizar ou baixar som binaural:", e); setMessage("Erro ao baixar o som binaural."); }
             finally { Tone.setContext(Tone.context); mg.dispose(); f.dispose(); r.dispose(); o1.dispose(); o2.dispose(); }
           };
-
           const bufferToWave = (abuffer, len, sampleRate) => {
             const nC = 1, l = len * nC * 2 + 44, b = new ArrayBuffer(l), v = new DataView(b); let o = 0;
             ws(v, o, 'RIFF'); o += 4; v.setUint32(o, 36 + len * nC * 2, true); o += 4;
@@ -183,7 +186,6 @@
           };
           const ws = (v, o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
           const f16BPCM = (o, off, i) => { for (let j = 0; j < i.length; j++, off += 2) { const s = Math.max(-1, Math.min(1, i[j])); o.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true); } };
-
           const handleSaveSound = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!behavior && !trigger) { setMessage("Preencha comportamento ou gatilho."); return; }
@@ -201,56 +203,53 @@
             catch (e) { console.error("Erro ao excluir som:", e); setMessage("Erro ao excluir a som."); }
           };
           React.useEffect(() => { return () => { if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); } Tone.Transport.stop(); Tone.Transport.cancel(); }; }, [player]);
-
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Gerador de Sons Binaurais</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Crie sons personalizados para acalmar durante uma crise, baseados em seu comportamento e gatilhos.</p>
-              <div className="mb-3 sm:mb-4"><label htmlFor="behavior" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Comportamento durante a crise:</label><input type="text" id="behavior" value={behavior} onChange={(e) => setBehavior(e.target.value)} placeholder="Ex: Agitação, choro, isolamento" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" /></div>
-              <div className="mb-3 sm:mb-4"><label htmlFor="trigger" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Gatilhos identificados:</label><input type="text" id="trigger" value={trigger} onChange={(e) => setTrigger(e.target.value)} placeholder="Ex: Ruídos altos, luzes fortes, mudanças de rotina" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" /></div>
-              <div className="mb-3 sm:mb-4"><label htmlFor="baseFrequency" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Frequência Base (Hz): {baseFrequency.toFixed(0)}</label><input type="range" id="baseFrequency" min="100" max="500" value={baseFrequency} onChange={(e) => setBaseFrequency(parseFloat(e.target.value))} className="w-full h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
-              <div className="mb-4 sm:mb-6"><label htmlFor="frequencyDiff" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Diferença de Frequência (Hz): {frequencyDiff.toFixed(1)}</label><input type="range" id="frequencyDiff" min="1" max="10" step="0.1" value={frequencyDiff} onChange={(e) => setFrequencyDiff(parseFloat(e.target.value))} className="w-full h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
-              <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
-                <button onClick={() => isPlaying ? stopSound() : playSound()} className={`px-4 py-2 text-sm sm:px-6 sm:py-3 bg-green-600 text-white font-bold rounded-lg shadow-md ${isPlaying ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'} transition duration-300 flex-grow`}>{isPlaying ? 'Parar e Gerar Novo' : 'Gerar e Tocar Som'}</button>
-                <button onClick={stopSound} disabled={!isPlaying} className={`px-4 py-2 text-sm sm:px-6 sm:py-3 bg-red-600 text-white font-bold rounded-lg shadow-md ${!isPlaying ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'} transition duration-300 flex-grow`}>Parar Som</button>
-                <button onClick={handleSaveSound} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 flex-grow">{editingSound ? 'Modificar Som' : 'Salvar Som'}</button>
-                <button onClick={handleDownloadBinaural} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-purple-600 text-white font-bold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex-grow">Download MP3</button>
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Gerador de Sons Binaurais</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Crie sons personalizados para acalmar durante uma crise, baseados em seu comportamento e gatilhos.</p>
+              <div className="mb-2"><label htmlFor="behavior" className="block text-gray-700 text-xs font-bold mb-1">Comportamento:</label><input type="text" id="behavior" value={behavior} onChange={(e) => setBehavior(e.target.value)} placeholder="Ex: Agitação, choro" className="shadow border rounded w-full py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" /></div>
+              <div className="mb-2"><label htmlFor="trigger" className="block text-gray-700 text-xs font-bold mb-1">Gatilhos:</label><input type="text" id="trigger" value={trigger} onChange={(e) => setTrigger(e.target.value)} placeholder="Ex: Ruídos altos" className="shadow border rounded w-full py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" /></div>
+              <div className="mb-2"><label htmlFor="baseFrequency" className="block text-gray-700 text-xs font-bold mb-1">Freq. Base (Hz): {baseFrequency.toFixed(0)}</label><input type="range" id="baseFrequency" min="100" max="500" value={baseFrequency} onChange={(e) => setBaseFrequency(parseFloat(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
+              <div className="mb-3"><label htmlFor="frequencyDiff" className="block text-gray-700 text-xs font-bold mb-1">Dif. Freq (Hz): {frequencyDiff.toFixed(1)}</label><input type="range" id="frequencyDiff" min="1" max="10" step="0.1" value={frequencyDiff} onChange={(e) => setFrequencyDiff(parseFloat(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
+              <div className="flex flex-wrap gap-1 sm:gap-2 mb-3">
+                <button onClick={() => isPlaying ? stopSound() : playSound()} className={`px-2 py-1 text-xs sm:px-3 sm:py-1.5 bg-green-600 text-white font-bold rounded-lg shadow-md ${isPlaying ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'} transition duration-300 flex-grow`}>{isPlaying ? 'Parar e Gerar Novo' : 'Gerar e Tocar'}</button>
+                <button onClick={stopSound} disabled={!isPlaying} className={`px-2 py-1 text-xs sm:px-3 sm:py-1.5 bg-red-600 text-white font-bold rounded-lg shadow-md ${!isPlaying ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'} transition duration-300 flex-grow`}>Parar</button>
+                <button onClick={handleSaveSound} className="px-2 py-1 text-xs sm:px-3 sm:py-1.5 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 flex-grow">{editingSound ? 'Modificar' : 'Salvar'}</button>
+                <button onClick={handleDownloadBinaural} className="px-2 py-1 text-xs sm:px-3 sm:py-1.5 bg-purple-600 text-white font-bold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex-grow">Download MP3</button>
               </div>
-              {message && <p className="text-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{message}</p>}
-              <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Meus Sons Salvos</h3>
-              {userSounds.length === 0 ? (<p className="text-sm text-gray-600">Nenhum som salvo ainda. Crie um acima!</p>) : (
-                <ul className="space-y-2 sm:space-y-3">
-                  {userSounds.map(s => (<li key={s.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                    <div><p className="font-semibold text-blue-800 text-sm sm:text-base">Comportamento: {s.behavior || 'N/A'}</p><p className="text-xs sm:text-sm text-gray-700">Gatilho: {s.trigger || 'N/A'}</p><p className="text-xs text-gray-500">Freq. Base: {s.baseFrequency} Hz, Dif. Freq: {s.frequencyDiff} Hz</p></div>
-                    <div className="flex gap-1 sm:gap-2 mt-2 sm:mt-0">
-                      <button onClick={() => { setFrequencyDiff(s.frequencyDiff); setBaseFrequency(s.baseFrequency); playSound(); }} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-purple-500 text-white rounded-md hover:bg-purple-600">Ouvir</button>
-                      <button onClick={() => handleEditSound(s)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">Editar</button>
-                      <button onClick={() => handleDeleteSound(s.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
+              {message && <p className="text-center text-xs text-gray-600 mb-2">{message}</p>}
+              <h3 className="text-base sm:text-lg font-bold text-blue-700 mb-1">Meus Sons Salvos</h3>
+              {userSounds.length === 0 ? (<p className="text-xs text-gray-600">Nenhum som salvo ainda.</p>) : (
+                <ul className="space-y-1.5">
+                  {userSounds.map(s => (<li key={s.id} className="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div><p className="font-semibold text-blue-800 text-xs sm:text-sm">Comportamento: {s.behavior || 'N/A'}</p><p className="text-xs text-gray-700">Gatilho: {s.trigger || 'N/A'}</p><p className="text-xs text-gray-500">Freq. Base: {s.baseFrequency} Hz, Dif. Freq: {s.frequencyDiff} Hz</p></div>
+                    <div className="flex gap-1 mt-1 sm:mt-0">
+                      <button onClick={() => { setFrequencyDiff(s.frequencyDiff); setBaseFrequency(s.baseFrequency); playSound(); }} className="px-1.5 py-0.5 text-xs bg-purple-500 text-white rounded-md hover:bg-purple-600">Ouvir</button>
+                      <button onClick={() => handleEditSound(s)} className="px-1.5 py-0.5 text-xs bg-yellow-500 text-white rounded-md hover:bg-yellow-600">Editar</button>
+                      <button onClick={() => handleDeleteSound(s.id)} className="px-1.5 py-0.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
                     </div>
                   </li>))}
                 </ul>
               )}
               {showUpgradeModal && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white p-5 sm:p-6 rounded-lg shadow-xl text-center w-full max-w-xs sm:max-w-sm mx-auto">
-                    {!showPixInfo ? (<><h3 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Limite Atingido!</h3><p className="text-sm sm:text-lg text-gray-800 mb-4 sm:mb-6">Você atingiu o limite de 5 sons binaurais gratuitos. Para gerar e salvar mais sons, adquira o **Plano Pro** de 500 sons binaurais mensais por R$ 50,00 reais.</p><div className="flex flex-col gap-3 sm:gap-4">
-                      <button onClick={() => setShowPixInfo(true)} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700">Adquira 500 sons binaurais por R$ 50,00 reais</button>
-                      <button onClick={() => setShowUpgradeModal(false)} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-gray-400 text-white font-bold rounded-lg shadow-md hover:bg-gray-500">Voltar</button></div></>) : (
-                      <><h3 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Informações para Pagamento via Pix</h3><p className="text-sm sm:text-lg text-gray-800 mb-3 sm:mb-4">Chave Pix: <span className="font-mono break-all text-green-600">42984242899</span></p><p className="text-sm sm:text-lg text-gray-800 mb-4 sm:mb-6">Envie o comprovante no WhatsApp: <span className="font-mono break-all text-green-600">+55 (42) 84242899</span></p>
-                        <button onClick={() => { setShowUpgradeModal(false); setShowPixInfo(false); }} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button></>)}
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-2">
+                  <div className="bg-white p-4 sm:p-5 rounded-lg shadow-xl text-center w-full max-w-xs mx-auto">
+                    {!showPixInfo ? (<><h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Limite Atingido!</h3><p className="text-sm text-gray-800 mb-3">Você atingiu o limite de 5 sons binaurais gratuitos. Para mais, adquira o **Plano Pro** (R$ 50,00).</p><div className="flex flex-col gap-2">
+                      <button onClick={() => setShowPixInfo(true)} className="px-3 py-1.5 text-sm bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700">Adquira 500 sons por R$ 50,00</button>
+                      <button onClick={() => setShowUpgradeModal(false)} className="px-3 py-1.5 text-sm bg-gray-400 text-white font-bold rounded-lg shadow-md hover:bg-gray-500">Voltar</button></div></>) : (
+                      <><h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Informações Pix</h3><p className="text-sm text-gray-800 mb-2">Chave Pix: <span className="font-mono break-all text-green-600">42984242899</span></p><p className="text-sm text-gray-800 mb-3">Envie comprovante no WhatsApp: <span className="font-mono break-all text-green-600">+55 (42) 84242899</span></p>
+                        <button onClick={() => { setShowUpgradeModal(false); setShowPixInfo(false); }} className="px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button></>)}
                   </div>
                 </div>
               )}
             </div>
           );
         };
-
         const DailyRoutine = () => {
           const { db, userId, isAuthReady } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
           const [morningTasks, setMorningTasks] = React.useState([]), [afternoonTasks, setAfternoonTasks] = React.useState([]), [eveningTasks, setEveningTasks] = React.useState([]), [newTask, setNewTask] = React.useState(''), [newTimeOfDay, setNewTimeOfDay] = React.useState('morning'), [newAlarmTime, setNewAlarmTime] = React.useState(''), [message, setMessage] = React.useState(''), [showAlarmModal, setShowAlarmModal] = React.useState(false), [currentAlarmTask, setCurrentAlarmTask] = React.useState('');
           const alarmIntervalRef = React.useRef(null);
-
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const routineColRef = db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`);
@@ -262,7 +261,6 @@
             }, (e) => { console.error("Erro ao buscar rotina diária:", e); setMessage("Erro ao carregar sua rotina."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
-
           React.useEffect(() => {
             if (!isAuthReady) return;
             if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current);
@@ -286,7 +284,6 @@
             }, 5000);
             return () => { if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current); };
           }, [morningTasks, afternoonTasks, eveningTasks, isAuthReady]);
-
           const handleAddTask = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!newTask.trim()) { setMessage("A tarefa não pode estar vazia."); return; }
@@ -298,57 +295,53 @@
             try { await db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`).doc(tId).delete(); setMessage("Tarefa excluída!"); }
             catch (e) { console.error("Erro ao excluir tarefa:", e); setMessage("Erro ao excluir a tarefa."); }
           };
-
           const renderTaskList = (tasks, title) => (
-            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">{title}</h3>
-              {tasks.length === 0 ? (<p className="text-sm text-gray-600">Nenhuma tarefa para {title.toLowerCase()}.</p>) : (
-                <ul className="space-y-1.5 sm:space-y-2">
-                  {tasks.map(t => (<li key={t.id} className="flex justify-between items-center bg-white p-2 sm:p-3 rounded-md shadow-xs">
-                    <span className="text-sm text-gray-800">{t.task} {t.alarmTime && <span className="text-blue-500 text-xs sm:text-sm">({t.alarmTime})</span>}</span>
-                    <button onClick={() => handleDeleteTask(t.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
+            <div className="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-blue-700 mb-1">{title}</h3>
+              {tasks.length === 0 ? (<p className="text-xs text-gray-600">Nenhuma tarefa para {title.toLowerCase()}.</p>) : (
+                <ul className="space-y-1">
+                  {tasks.map(t => (<li key={t.id} className="flex justify-between items-center bg-white p-1.5 rounded-md shadow-xs">
+                    <span className="text-xs text-gray-800">{t.task} {t.alarmTime && <span className="text-blue-500 text-xs">({t.alarmTime})</span>}</span>
+                    <button onClick={() => handleDeleteTask(t.id)} className="px-1.5 py-0.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
                   </li>))}
                 </ul>
               )}
             </div>
           );
-
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Rotina Diária</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Organize suas tarefas para manhã, tarde e noite para uma estrutura previsível.</p>
-              <div className="mb-4 sm:mb-6 p-3 sm:p-4 border border-blue-200 rounded-lg">
-                <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">Adicionar Nova Tarefa</h3>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3 sm:mb-4">
-                  <input type="text" value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="Descreva a tarefa" className="shadow border rounded w-full sm:w-1/2 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
-                  <input type="time" value={newAlarmTime} onChange={(e) => setNewAlarmTime(e.target.value)} className="shadow border rounded w-full sm:w-1/4 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" title="Definir hora do alarme" />
-                  <select value={newTimeOfDay} onChange={(e) => setNewTimeOfDay(e.target.value)} className="shadow border rounded w-full sm:w-1/4 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm">
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Rotina Diária</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Organize suas tarefas para manhã, tarde e noite para uma estrutura previsível.</p>
+              <div className="mb-3 p-2 border border-blue-200 rounded-lg">
+                <h3 className="text-base sm:text-lg font-semibold text-blue-700 mb-1">Adicionar Nova Tarefa</h3>
+                <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mb-2">
+                  <input type="text" value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="Descreva a tarefa" className="shadow border rounded w-full sm:w-1/2 py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" />
+                  <input type="time" value={newAlarmTime} onChange={(e) => setNewAlarmTime(e.target.value)} className="shadow border rounded w-full sm:w-1/4 py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" title="Definir hora do alarme" />
+                  <select value={newTimeOfDay} onChange={(e) => setNewTimeOfDay(e.target.value)} className="shadow border rounded w-full sm:w-1/4 py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs">
                     <option value="morning">Manhã</option><option value="afternoon">Tarde</option><option value="evening">Noite</option>
                   </select>
                 </div>
-                <button onClick={handleAddTask} className="px-4 py-2 text-sm sm:px-6 sm:py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 w-full">Adicionar Tarefa</button>
-                {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">{message}</p>}
+                <button onClick={handleAddTask} className="px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 w-full">Adicionar Tarefa</button>
+                {message && <p className="text-center text-xs text-gray-600 mt-1">{message}</p>}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3">
                 {renderTaskList(morningTasks, 'Manhã')}{renderTaskList(afternoonTasks, 'Tarde')}{renderTaskList(eveningTasks, 'Noite')}
               </div>
               {showAlarmModal && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white p-5 sm:p-6 rounded-lg shadow-xl text-center w-full max-w-xs sm:max-w-sm mx-auto">
-                    <h3 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">ALARM!</h3><p className="text-lg sm:text-xl text-gray-800 mb-4 sm:mb-6">Hora de: <span className="font-semibold">{currentAlarmTask}</span></p>
-                    <button onClick={() => setShowAlarmModal(false)} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button>
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-2">
+                  <div className="bg-white p-4 sm:p-5 rounded-lg shadow-xl text-center w-full max-w-xs mx-auto">
+                    <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">ALARM!</h3><p className="text-sm text-gray-800 mb-3">Hora de: <span className="font-semibold">{currentAlarmTask}</span></p>
+                    <button onClick={() => setShowAlarmModal(false)} className="px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button>
                   </div>
                 </div>
               )}
             </div>
           );
         };
-
         const MonthlyProgressChart = () => {
           const { db, userId, isAuthReady } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
           const [crisisData, setCrisisData] = React.useState([]), [message, setMessage] = React.useState('');
-
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const assessmentsColRef = db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`);
@@ -367,29 +360,26 @@
             }, (e) => { console.error("Erro ao buscar dados de crise:", e); setMessage("Erro ao carregar dados de crise para o gráfico."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
-
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg mt-4 sm:mt-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Evolução Mensal das Crises</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Acompanhe a média do nível de suas crises ao longo dos meses.</p>
-              {message && <p className="text-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{message}</p>}
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg mt-3">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Evolução Mensal das Crises</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Acompanhe a média do nível de suas crises ao longo dos meses.</p>
+              {message && <p className="text-center text-xs text-gray-600 mb-3">{message}</p>}
               {crisisData.length > 0 && (
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={crisisData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" tick={{fontSize: 10}} /><YAxis domain={[0, 5]} tick={{fontSize: 10}} />
-                    <Tooltip /><Legend wrapperStyle={{fontSize: '12px'}} /><Line type="monotone" dataKey="Nível Médio de Crise" stroke="#8884d8" activeDot={{ r: 8 }} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <Recharts.ResponsiveContainer width="100%" height={200}>
+                  <Recharts.LineChart data={crisisData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                    <Recharts.CartesianGrid strokeDasharray="3 3" /><Recharts.XAxis dataKey="name" tick={{fontSize: 8}} /><Recharts.YAxis domain={[0, 5]} tick={{fontSize: 8}} />
+                    <Recharts.Tooltip /><Recharts.Legend wrapperStyle={{fontSize: '10px'}} /><Recharts.Line type="monotone" dataKey="Nível Médio de Crise" stroke="#8884d8" activeDot={{ r: 6 }} />
+                  </Recharts.LineChart>
+                </Recharts.ResponsiveContainer>
               )}
             </div>
           );
         };
-
         const SelfAssessment = () => {
           const { db, userId, isAuthReady } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
           const [assessmentText, setAssessmentText] = React.useState(''), [crisisLevel, setCrisisLevel] = React.useState(3), [assessments, setAssessments] = React.useState([]), [message, setMessage] = React.useState('');
-
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const assessmentsColRef = db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`);
@@ -399,7 +389,6 @@
             }, (e) => { console.error("Erro ao buscar autoavaliações:", e); setMessage("Erro ao carregar suas autoavaliações."); });
             return () => unsub();
           }, [db, userId, isAuthReady, appId]);
-
           const handleSaveAssessment = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!assessmentText.trim()) { setMessage("A autoavaliação não pode estar vazia."); return; }
@@ -421,24 +410,23 @@
             catch (e) { console.error("Erro ao excluir autoavaliação:", e); setMessage("Erro ao excluir a autoavaliação."); }
           };
           const formatDate = (iso) => new Date(iso).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Autoavaliação</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Acompanhe seu desenvolvimento e bem-estar após ouvir os sons.</p>
-              <div className="mb-4 sm:mb-6 p-3 sm:p-4 border border-blue-200 rounded-lg">
-                <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">Registrar Avaliação</h3>
-                <textarea value={assessmentText} onChange={(e) => setAssessmentText(e.target.value)} placeholder="Como você se sente hoje? O que você notou após ouvir os sons?" rows="4" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm mb-3 sm:mb-4"></textarea>
-                <div className="mb-3 sm:mb-4"><label htmlFor="crisisLevel" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Nível da Crise (0=Nenhuma, 5=Muito Alta): {crisisLevel}</label><input type="range" id="crisisLevel" min="0" max="5" step="1" value={crisisLevel} onChange={(e) => setCrisisLevel(parseInt(e.target.value))} className="w-full h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
-                <button onClick={handleSaveAssessment} className="px-4 py-2 text-sm sm:px-6 sm:py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 w-full">Salvar Avaliação</button>
-                {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">{message}</p>}
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Autoavaliação</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Acompanhe seu desenvolvimento e bem-estar após ouvir os sons.</p>
+              <div className="mb-3 p-2 border border-blue-200 rounded-lg">
+                <h3 className="text-base sm:text-lg font-semibold text-blue-700 mb-1">Registrar Avaliação</h3>
+                <textarea value={assessmentText} onChange={(e) => setAssessmentText(e.target.value)} placeholder="Como você se sente hoje? O que você notou após ouvir os sons?" rows="3" className="shadow border rounded w-full py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs mb-2"></textarea>
+                <div className="mb-2"><label htmlFor="crisisLevel" className="block text-gray-700 text-xs font-bold mb-1">Nível da Crise (0=Nenhuma, 5=Muito Alta): {crisisLevel}</label><input type="range" id="crisisLevel" min="0" max="5" step="1" value={crisisLevel} onChange={(e) => setCrisisLevel(parseInt(e.target.value))} className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
+                <button onClick={handleSaveAssessment} className="px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 w-full">Salvar Avaliação</button>
+                {message && <p className="text-center text-xs text-gray-600 mt-1">{message}</p>}
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Minhas Avaliações</h3>
-              {assessments.length === 0 ? (<p className="text-sm text-gray-600">Nenhuma autoavaliação registrada ainda.</p>) : (
-                <ul className="space-y-2 sm:space-y-4">
-                  {assessments.map(a => (<li key={a.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm">
-                    <p className="text-sm sm:text-base text-gray-800 mb-1 sm:mb-2">{a.text}</p><p className="text-xs sm:text-sm text-gray-600">Nível da Crise: {a.crisisLevel !== undefined ? a.crisisLevel : 'N/A'}</p>
-                    <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500 mt-2"><span>{formatDate(a.timestamp)}</span><button onClick={() => handleDeleteAssessment(a.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button></div>
+              <h3 className="text-base sm:text-lg font-bold text-blue-700 mb-1">Minhas Avaliações</h3>
+              {assessments.length === 0 ? (<p className="text-xs text-gray-600">Nenhuma autoavaliação registrada ainda.</p>) : (
+                <ul className="space-y-1.5">
+                  {assessments.map(a => (<li key={a.id} className="bg-blue-50 p-2 rounded-lg shadow-sm">
+                    <p className="text-xs sm:text-sm text-gray-800 mb-1">{a.text}</p><p className="text-xs text-gray-600">Nível da Crise: {a.crisisLevel !== undefined ? a.crisisLevel : 'N/A'}</p>
+                    <div className="flex justify-between items-center text-xs text-gray-500 mt-1"><span>{formatDate(a.timestamp)}</span><button onClick={() => handleDeleteAssessment(a.id)} className="px-1.5 py-0.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button></div>
                   </li>))}
                 </ul>
               )}
@@ -446,54 +434,49 @@
             </div>
           );
         };
-
         const SoundLibrary = () => {
           const { startAudioContext } = useAppContext();
           const [isPlaying, setIsPlaying] = React.useState(null);
           const currentPlayerRef = React.useRef(null);
           const sounds = [
-            { id: 'sh_song1', name: 'SoundHelix Song 1', description: 'Melodia relaxante.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+1', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-            { id: 'sh_song2', name: 'SoundHelix Song 2', description: 'Ritmo suave.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+2', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-            { id: 'sh_song3', name: 'SoundHelix Song 3', description: 'Harmonia tranquila.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+3', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-            { id: 'sh_song4', name: 'SoundHelix Song 4', description: 'Paz e serenidade.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+4', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-            { id: 'sh_song5', name: 'SoundHelix Song 5', description: 'Sons para meditar.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+5', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-            { id: 'sh_song6', name: 'SoundHelix Song 6', description: 'Calma e foco.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+6', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
-            { id: 'sh_song7', name: 'SoundHelix Song 7', description: 'Relaxamento profundo.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+7', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
-            { id: 'sh_song8', name: 'SoundHelix Song 8', description: 'Ambiente suave.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+8', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
-            { id: 'sh_song9', name: 'SoundHelix Song 9', description: 'Tranquilidade sonora.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+9', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
-            { id: 'sh_song10', name: 'SoundHelix Song 10', description: 'Sinfonia calma.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+10', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
+            { id: 'sh_song1', name: 'Música 1', description: 'Melodia relaxante.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+1', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+            { id: 'sh_song2', name: 'Música 2', description: 'Ritmo suave.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+2', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+            { id: 'sh_song3', name: 'Música 3', description: 'Harmonia tranquila.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+3', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+            { id: 'sh_song4', name: 'Música 4', description: 'Paz e serenidade.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+4', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+            { id: 'sh_song5', name: 'Música 5', description: 'Sons para meditar.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+5', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+            { id: 'sh_song6', name: 'Música 6', description: 'Calma e foco.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+6', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+            { id: 'sh_song7', name: 'Música 7', description: 'Relaxamento profundo.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+7', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+            { id: 'sh_song8', name: 'Música 8', description: 'Ambiente suave.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+8', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+            { id: 'sh_song9', name: 'Música 9', description: 'Tranquilidade sonora.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+9', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
+            { id: 'sh_song10', name: 'Música 10', description: 'Sinfonia calma.', image: 'https://placehold.co/100x100/CCCCCC/000?text=M%C3%BAsica+10', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
           ];
-
           const playSound = async (s) => { await startAudioContext(); stopCurrentSound(); try { const p = new Tone.Player(s.audioUrl).toDestination(); p.autostart = true; p.loop = true; p.volume.value = -10; currentPlayerRef.current = p; setIsPlaying(s.id); } catch (e) { console.error("Error playing sound:", e); } };
           const stopCurrentSound = () => { if (currentPlayerRef.current) { currentPlayerRef.current.stop(); currentPlayerRef.current.dispose(); currentPlayerRef.current = null; } setIsPlaying(null); Tone.Transport.stop(); Tone.Transport.cancel(); };
           React.useEffect(() => { return () => stopCurrentSound(); }, []);
-
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Biblioteca de Sons Instrumentais</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Explore uma variedade de sons instrumentais para promover o relaxamento e o bem-estar.</p>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-                {sounds.map(s => (<div key={s.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-md flex flex-col items-center text-center">
-                  <img src={s.image} alt={`Image of ${s.name}`} className="w-16 h-16 sm:w-24 sm:h-24 rounded-full mb-2 sm:mb-4 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/CCCCCC/000?text=Erro+Image`; }} />
-                  <h3 className="text-sm sm:text-xl font-semibold text-blue-800 mb-1 sm:mb-2">{s.name}</h3><p className="text-xs sm:text-sm text-gray-700 mb-2 sm:mb-4">{s.description}</p>
-                  <div className="flex flex-col gap-2 w-full">
-                    <button onClick={() => isPlaying === s.id ? stopCurrentSound() : playSound(s)} className={`px-3 py-1 text-xs sm:px-5 sm:py-2 rounded-lg font-bold shadow-md transition duration-300 ${isPlaying === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>{isPlaying === s.id ? 'Parar' : 'Tocar'}</button>
-                    <a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1 text-xs sm:px-5 sm:py-2 rounded-lg font-bold shadow-md transition duration-300 bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center justify-center">Ouvir no Navegador</a>
-                    <button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-3 py-1 text-xs sm:px-5 sm:py-2 rounded-lg font-bold shadow-md transition duration-300 bg-purple-600 hover:bg-purple-700 text-white inline-flex items-center justify-center">Download MP3</button>
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Biblioteca de Sons Instrumentais</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Explore uma variedade de sons instrumentais para promover o relaxamento e o bem-estar.</p>
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                {sounds.map(s => (<div key={s.id} className="bg-blue-50 p-2 rounded-lg shadow-md flex flex-col items-center text-center">
+                  <img src={s.image} alt={``} className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-2 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/80x80/CCCCCC/000?text=Erro`; }} />
+                  <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-1">{s.name}</h3><p className="text-xs text-gray-700 mb-2">{s.description}</p>
+                  <div className="flex flex-col gap-1 w-full">
+                    <button onClick={() => isPlaying === s.id ? stopCurrentSound() : playSound(s)} className={`px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 ${isPlaying === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>{isPlaying === s.id ? 'Parar' : 'Tocar'}</button>
+                    <a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center justify-center">Ouvir</a>
+                    <button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-2 py-1 text-xs rounded-lg font-bold shadow-md transition duration-300 bg-purple-600 hover:bg-purple-700 text-white inline-flex items-center justify-center">Download</button>
                   </div>
                 </div>))}
               </div>
             </div>
           );
         };
-
         const UserPlaylist = () => {
           const { db, userId, isAuthReady, startAudioContext } = useAppContext();
           const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
           const [playlistSongs, setPlaylistSongs] = React.useState([]), [newSongName, setNewSongName] = React.useState(''), [newCoverImage, setNewCoverImage] = React.useState(''), [newAudioUrl, setNewAudioUrl] = React.useState(''), [message, setMessage] = React.useState(''), [isPlaylistUnlocked, setIsPlaylistUnlocked] = React.useState(false), [currentPlayingSong, setCurrentPlayingSong] = React.useState(null);
           const playerRef = React.useRef(null);
           const MAX_PLAYLIST_SONGS = 10, CRISIS_LEVEL_GOAL = 2.0;
-
           React.useEffect(() => {
             if (!isAuthReady || !db || !userId) return;
             const playlistColRef = db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`);
@@ -514,7 +497,6 @@
             checkPlaylistUnlock();
             return () => { unsubPlaylist(); if (playerRef.current) { playerRef.current.stop(); playerRef.current.dispose(); playerRef.current = null; } };
           }, [db, userId, isAuthReady, appId]);
-
           const handleAddSong = async () => {
             if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
             if (!isPlaylistUnlocked) { setMessage("A playlist está bloqueada. Alcance a meta mensal para desbloquear!"); return; }
@@ -535,31 +517,30 @@
             catch (e) { console.error("Erro ao tocar música:", e); setMessage(`Erro ao tocar ${s.name}. Verifique a URL do áudio.`); }
           };
           const stopPlayingSong = () => { if (playerRef.current) { playerRef.current.stop(); playerRef.current.dispose(); playerRef.current = null; } setCurrentPlayingSong(null); setMessage('Música parada.'); };
-
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Minha Playlist Favorita</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Adicione até {MAX_PLAYLIST_SONGS} músicas favoritas. Desbloqueie esta funcionalidade mantendo seu nível médio de crise abaixo de {CRISIS_LEVEL_GOAL} no mês anterior (registrado na Autoavaliação).</p>
-              {!isPlaylistUnlocked && (<div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert"><p className="font-bold">Playlist Bloqueada</p><p className="text-sm">Para desbloquear, sua média de nível de crise do mês anterior precisa ser de {CRISIS_LEVEL_GOAL} ou menos. Continue usando a Autoavaliação!</p></div>)}
-              <div className={`mb-4 sm:mb-6 p-3 sm:p-4 border border-blue-200 rounded-lg ${!isPlaylistUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">Adicionar Nova Música</h3>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3 sm:mb-4">
-                  <input type="text" value={newSongName} onChange={(e) => setNewSongName(e.target.value)} placeholder="Nome da Música" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
-                  <input type="text" value={newCoverImage} onChange={(e) => setNewCoverImage(e.target.value)} placeholder="URL da Imagem de Capa (opcional)" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
-                  <input type="text" value={newAudioUrl} onChange={(e) => setNewAudioUrl(e.target.value)} placeholder="URL do Áudio (MP3 hospedado)" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Minha Playlist Favorita</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Adicione até {MAX_PLAYLIST_SONGS} músicas favoritas. Desbloqueie esta funcionalidade mantendo seu nível médio de crise abaixo de {CRISIS_LEVEL_GOAL} no mês anterior (registrado na Autoavaliação).</p>
+              {!isPlaylistUnlocked && (<div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-2 mb-3 rounded-md" role="alert"><p className="font-bold text-sm">Playlist Bloqueada</p><p className="text-xs">Para desbloquear, sua média de nível de crise do mês anterior precisa ser de {CRISIS_LEVEL_GOAL} ou menos.</p></div>)}
+              <div className={`mb-3 p-2 border border-blue-200 rounded-lg ${!isPlaylistUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <h3 className="text-base sm:text-lg font-semibold text-blue-700 mb-1">Adicionar Música</h3>
+                <div className="flex flex-col sm:flex-row gap-1 mb-2">
+                  <input type="text" value={newSongName} onChange={(e) => setNewSongName(e.target.value)} placeholder="Nome" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" />
+                  <input type="text" value={newCoverImage} onChange={(e) => setNewCoverImage(e.target.value)} placeholder="URL Capa (opcional)" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" />
+                  <input type="text" value={newAudioUrl} onChange={(e) => setNewAudioUrl(e.target.value)} placeholder="URL Áudio (MP3)" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs" />
                 </div>
-                <button onClick={handleAddSong} disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className={`px-4 py-2 text-sm sm:px-6 sm:py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md ${!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300 w-full`}>Adicionar Música à Playlist</button>
-                {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">{message}</p>}
+                <button onClick={handleAddSong} disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className={`px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md ${!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300 w-full`}>Adicionar</button>
+                {message && <p className="text-center text-xs text-gray-600 mt-1">{message}</p>}
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Minhas Músicas</h3>
-              {playlistSongs.length === 0 ? (<p className="text-sm text-gray-600">Nenhuma música na playlist ainda.</p>) : (
-                <ul className="space-y-2 sm:space-y-3">
-                  {playlistSongs.map(s => (<li key={s.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                    <div className="flex items-center gap-3"><img src={s.coverImage} alt={`Capa de ${s.name}`} className="w-12 h-12 sm:w-16 sm:h-16 rounded-md object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/64x64/CCCCCC/000?text=Sem+Capa`; }} /><div><p className="font-semibold text-blue-800 text-sm sm:text-base">{s.name}</p><p className="text-xs text-gray-500">Adicionado em: {new Date(s.timestamp).toLocaleDateString('pt-BR')}</p></div></div>
-                    <div className="flex gap-1 sm:gap-2 mt-2 sm:mt-0">
-                      <button onClick={() => currentPlayingSong && currentPlayingSong.id === s.id ? stopPlayingSong() : playSong(s)} className={`px-2 py-0.5 text-xs sm:px-3 sm:py-1 rounded-md font-bold text-sm transition duration-300 ${currentPlayingSong && currentPlayingSong.id === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}>{currentPlayingSong && currentPlayingSong.id === s.id ? 'Parar' : 'Tocar'}</button>
-                      {s.audioUrl && s.audioUrl.trim() !== '' && (<><a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Ouvir no Navegador</a><button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Download</button></>)}
-                      <button onClick={() => handleDeleteSong(s.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300">Excluir</button>
+              <h3 className="text-base sm:text-lg font-bold text-blue-700 mb-1">Minhas Músicas</h3>
+              {playlistSongs.length === 0 ? (<p className="text-xs text-gray-600">Nenhuma música na playlist ainda.</p>) : (
+                <ul className="space-y-1.5">
+                  {playlistSongs.map(s => (<li key={s.id} className="bg-blue-50 p-2 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="flex items-center gap-2"><img src={s.coverImage} alt={``} className="w-10 h-10 sm:w-12 sm:h-12 rounded-md object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/48x48/CCCCCC/000?text=Capa`; }} /><div><p className="font-semibold text-blue-800 text-xs sm:text-sm">{s.name}</p><p className="text-xs text-gray-500">Adicionado: {new Date(s.timestamp).toLocaleDateString('pt-BR')}</p></div></div>
+                    <div className="flex gap-1 mt-1 sm:mt-0">
+                      <button onClick={() => currentPlayingSong && currentPlayingSong.id === s.id ? stopPlayingSong() : playSong(s)} className={`px-1.5 py-0.5 text-xs rounded-md font-bold transition duration-300 ${currentPlayingSong && currentPlayingSong.id === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}>{currentPlayingSong && currentPlayingSong.id === s.id ? 'Parar' : 'Tocar'}</button>
+                      {s.audioUrl && s.audioUrl.trim() !== '' && (<><a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-1.5 py-0.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Ouvir</a><button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-1.5 py-0.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Download</button></>)}
+                      <button onClick={() => handleDeleteSong(s.id)} className="px-1.5 py-0.5 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300">Excluir</button>
                     </div>
                   </li>))}
                 </ul>
@@ -567,31 +548,29 @@
             </div>
           );
         };
-
         const CommunicationImprovement = () => {
           const tips = [
-            { title: "Seja Direto e Claro", description: "Use linguagem simples e evite sarcasmo, ironia ou metáforas que possam ser mal interpretadas. A clareza é fundamental." },
-            { title: "Use Apoios Visuais", description: "Imagens, diagramas ou listas podem ajudar a transmitir informações de forma mais eficaz, especialmente para conceitos abstratos." },
-            { title: "Dê Tempo para Processar", description: "Permita um tempo extra para que a pessoa autista processe o que foi dito e formule uma resposta. Evite interromper." },
-            { title: "Valide Sentimentos", description: "Reconheça e valide as emoções da pessoa, mesmo que você não as compreenda totalmente. Isso cria um ambiente de confiança." },
-            { title: "Evite Sobrecarga Sensorial", description: "Em ambientes com muitos estímulos (barulho, luzes fortes), a comunicação pode ser mais difícil. Procure locais mais calmos." },
-            { title: "Peça Esclarecimentos", description: "Se não tiver certeza do que foi dito, peça para a pessoa repetir ou explicar de outra forma. Isso evita mal-entendidos." },
-            { title: "Foco em um Tópico por Vez", description: "Evite mudar de assunto rapidamente. Mantenha a conversa focada em um tópico até que ele seja completamente abordado." },
-            { title: "Observe Sinais Não-Verbais", description: "Esteja atento a gestos, expressões faciais e postura, mas lembre-se que eles podem ser diferentes ou menos expressivos em pessoas autistas." },
+            { title: "Direto e Claro", description: "Use linguagem simples, evite sarcasmo ou metáforas." },
+            { title: "Apoios Visuais", description: "Imagens, diagramas ou listas ajudam a transmitir informações." },
+            { title: "Tempo para Processar", description: "Permita tempo extra para processar e responder." },
+            { title: "Valide Sentimentos", description: "Reconheça emoções, mesmo que não as compreenda totalmente." },
+            { title: "Evite Sobrecarga", description: "Procure locais calmos, evite muitos estímulos." },
+            { title: "Peça Esclarecimentos", description: "Se não tiver certeza, peça para repetir ou explicar." },
+            { title: "Um Tópico por Vez", description: "Mantenha a conversa focada em um tópico." },
+            { title: "Sinais Não-Verbais", description: "Observe gestos e expressões, mas lembre-se que eles podem ser diferentes." },
           ];
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Como Melhorar a Comunicação de Autistas com Não-Autistas</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Dicas e estratégias para promover uma comunicação mais eficaz e compreensiva.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {tips.map((t, i) => (<div key={i} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-md">
-                  <h3 className="text-base sm:text-xl font-semibold text-blue-800 mb-1 sm:mb-2">{t.title}</h3><p className="text-xs sm:text-sm text-gray-700">{t.description}</p>
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Melhorar Comunicação</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Dicas e estratégias para promover uma comunicação mais eficaz e compreensiva.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+                {tips.map((t, i) => (<div key={i} className="bg-blue-50 p-2 rounded-lg shadow-md">
+                  <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-1">{t.title}</h3><p className="text-xs text-gray-700">{t.description}</p>
                 </div>))}
               </div>
             </div>
           );
         };
-
         const AIHelper = () => {
           const [difficulty, setDifficulty] = React.useState(''), [youtubeLinks, setYoutubeLinks] = React.useState([]), [loading, setLoading] = React.useState(false), [message, setMessage] = React.useState('');
           const generateAndFetchLinks = async () => {
@@ -605,33 +584,32 @@
               if (r.candidates?.[0]?.content?.parts?.[0]?.text) {
                 const queries = JSON.parse(r.candidates[0].content.parts[0].text).queries;
                 if (queries?.length > 0) {
-                  setYoutubeLinks(queries.map(q => ({ title: `Exemplo de vídeo sobre "${q}"`, url: `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}` })));
+                  setYoutubeLinks(queries.map(q => ({ title: `Vídeo sobre "${q}"`, url: `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}` })));
                   setMessage("Aqui estão algumas sugestões de vídeos do YouTube:");
-                } else { setMessage("A IA não conseguiu gerar termos de busca relevantes. Tente descrever sua dificuldade de forma diferente."); }
-              } else { setMessage("Erro ao processar a resposta da IA. Tente novamente."); }
-            } catch (e) { console.error("Erro ao gerar links do YouTube:", e); setMessage("Erro ao gerar sugestões. Tente novamente mais tarde."); }
+                } else { setMessage("A IA não conseguiu gerar termos de busca relevantes."); }
+              } else { setMessage("Erro ao processar a resposta da IA."); }
+            } catch (e) { console.error("Erro ao gerar links do YouTube:", e); setMessage("Erro ao gerar sugestões. Tente novamente."); }
             finally { setLoading(false); }
           };
           return (
-            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Ajuda da Inteligência Artificial ✨</h2>
-              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Descreva sua maior dificuldade e a IA irá sugerir vídeos do YouTube para ajudar.</p>
-              <div className="mb-3 sm:mb-4"><label htmlFor="difficulty" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Qual é a sua maior dificuldade atualmente?</label><textarea id="difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} placeholder="Ex: Dificuldade em lidar com ambientes barulhentos, problemas para iniciar tarefas, ansiedade social." rows="4" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm"></textarea></div>
-              <button onClick={generateAndFetchLinks} disabled={loading} className={`px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300 w-full`}>{loading ? 'Gerando...' : 'Gerar Sugestões de Vídeos ✨'}</button>
-              {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-3 sm:mt-4">{message}</p>}
-              {youtubeLinks.length > 0 && (<div className="mt-4 sm:mt-6"><h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Vídeos Sugeridos:</h3><ul className="space-y-2 sm:space-y-3">{youtubeLinks.map((l, i) => (<li key={i} className="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm"><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline font-semibold text-sm sm:text-base">{l.title}</a></li>))}</ul></div>)}
+            <div className="p-3 sm:p-4 bg-white rounded-lg shadow-lg">
+              <h2 className="text-lg sm:text-xl font-bold text-blue-700 mb-2">Ajuda da Inteligência Artificial ✨</h2>
+              <p className="text-xs sm:text-sm text-gray-700 mb-3">Descreva sua maior dificuldade e a IA irá sugerir vídeos do YouTube para ajudar.</p>
+              <div className="mb-2"><label htmlFor="difficulty" className="block text-gray-700 text-xs font-bold mb-1">Qual sua dificuldade?</label><textarea id="difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} placeholder="Ex: Lidar com barulhos, iniciar tarefas." rows="3" className="shadow border rounded w-full py-1 px-2 text-gray-700 focus:outline-none focus:shadow-outline text-xs"></textarea></div>
+              <button onClick={generateAndFetchLinks} disabled={loading} className={`px-3 py-1.5 text-sm bg-blue-600 text-white font-bold rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300 w-full`}>{loading ? 'Gerando...' : 'Gerar Sugestões ✨'}</button>
+              {message && <p className="text-center text-xs text-gray-600 mt-2">{message}</p>}
+              {youtubeLinks.length > 0 && (<div className="mt-3"><h3 className="text-base sm:text-lg font-bold text-blue-700 mb-1">Vídeos Sugeridos:</h3><ul className="space-y-1.5">{youtubeLinks.map((l, i) => (<li key={i} className="bg-blue-50 p-2 rounded-lg shadow-sm"><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline font-semibold text-xs sm:text-sm">{l.title}</a></li>))}</ul></div>)}
             </div>
           );
         };
-
         const App = () => {
           const [view, setView] = React.useState('home');
           return (
             <AppProvider>
-              <div className="min-h-screen bg-blue-100 p-2 sm:p-4 flex flex-col items-center">
-                <Header setView={setView} />
-                <main className="mt-4 w-full max-w-full sm:max-w-4xl">
-                  {view === 'home' && <Home />}
+              <div className="min-h-screen bg-blue-100 p-2 flex flex-col items-center">
+                <HeaderTitle />
+                <main className="mt-2 w-full max-w-full sm:max-w-4xl pb-16">
+                  {view === 'home' && <Home setView={setView} />}
                   {view === 'binaural' && <BinauralGenerator />}
                   {view === 'routine' && <DailyRoutine />}
                   {view === 'selfAssessment' && <SelfAssessment />}
@@ -640,11 +618,11 @@
                   {view === 'communication' && <CommunicationImprovement />}
                   {view === 'aiHelper' && <AIHelper />}
                 </main>
+                <FooterNav />
               </div>
             </AppProvider>
           );
         };
-
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
