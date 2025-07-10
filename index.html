@@ -1,10 +1,23 @@
+html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binaural Calm</title>
-    html
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Binaural Calm</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+body { font-family:'Inter',sans-serif;
+backgroun:#e0f2fe; padding: quem;}
+input, Button { margin: 0.25rem 0;
+padding: 0.5rem; font-size: quem;}
+</style>
+</Head>
+<body>
+<h1 class="text-2xl font-bild
+mb-4">Binaural Calm>/h1>
+    
     <head>
         <!-- Aqui está o link do manifest-->
         <link rel="manifest"
@@ -18,7 +31,49 @@
   </div>
         
   <div id="app"></div>
-        
+
+        <!-- Inicialização do Firebase e Autenticação -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_STORAGE_BUCKET",
+      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+      appId: "SEU_APP_ID",
+      measurementId: "SEU_MEASUREMENT_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.signup = async () => {
+      const email = document.getElementById('email').value;
+ const password = document.getElementById('password').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert('Conta criada com sucesso!');
+      } catch (e) {
+        alert('Erro: ' + e.message);
+      }
+    };
+
+    window.login = async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert('Login efetuado com sucesso!');
+      } catch (e) {
+        alert('Erro: ' + e.message);
+      }
+    };
+  </script>
+</body>
+    </html>
 <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>body{font-family:'Inter',sans-serif;background-color:#f0f4f8;color:#334155;padding-top:0;padding-bottom:5rem;min-height:100vh;overflow-x:hidden} .container{max-width:960px;margin:0 auto;padding:1.5rem;background-color:transparent} section{background-color:#fff;border-radius:1.5rem;box-shadow:0 12px 24px rgba(0,0,0,.1);margin-bottom:2.5rem;padding:2rem;border:1px solid #e2e8f0} h1,h2,h3{color:#253b59;font-weight:700} h1{font-size:2.5rem;margin-bottom:1.5rem;text-align:center} h2{font-size:2rem;margin-bottom:1.25rem} h3{font-size:1.5rem;margin-bottom:1rem} p{color:#64748b;line-height:1.6} .btn{padding:.8rem 1.8rem;border-radius:.75rem;font-weight:600;transition:all .3s ease;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;border:none} .btn-primary{background-color:#6366f1;color:#fff;box-shadow:0 4px 8px rgba(99,102,241,.3)} .btn-primary:hover{background-color:#4f46e5;transform:translateY(-2px);box-shadow:0 6px 12px rgba(79,70,229,.4)} .btn-secondary{background-color:#eef2f8;color:#475569;border:1px solid #cbd5e1} .btn-secondary:hover{background-color:#dbe7f5;transform:translateY(-2px);box-shadow:0 2px 4px rgba(0,0,0,.1)} .btn:disabled{opacity:.6;cursor:not-allowed} .input-range{width:100%;height:10px;background:#e2e8f0;border-radius:5px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer} .input-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;background:#6366f1;border-radius:50%;cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.2);border:3px solid #fff} .input-range::-webkit-slider-thumb:active{cursor:grabbing} .input-range::-moz-range-thumb{width:24px;height:24px;background:#6366f1;border-radius:50%;cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.2);border:3px solid #fff} .input-range::-moz-range-thumb:active{cursor:grabbing} .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,.5);display:flex;justify-content:center;align-items:center;padding:1rem} .modal-content{background-color:#fff;padding:2rem;border-radius:1.5rem;box-shadow:0 10px 20px rgba(0,0,0,.2);width:90%;max-width:450px;text-align:center;position:relative} .close-button{position:absolute;top:1rem;right:1rem;color:#aaa;font-size:2rem;font-weight:700;cursor:pointer;transition:color .2s} .close-button:hover,.close-button:focus{color:#666} .loading-spinner{border:4px solid rgba(99,102,241,.2);border-left-color:#6366f1;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite} @keyframes spin{to{transform:rotate(360deg)}} .sound-card,.video-card{background-color:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:1.25rem;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;border:1px solid #e2e8f0} .sound-card:hover,.video-card:hover{transform:translateY(-5px);box-shadow:0 8px 16px rgba(0,0,0,.12)} .sound-card-icon{font-size:3rem;margin-bottom:.75rem;color:#4f46e5} .video-card iframe{width:100%;aspect-ratio:16/9;border-radius:.75rem;margin-bottom:1rem;border:none} .video-card h3{font-size:1.25rem;margin-bottom:.5rem} .video-card p{font-size:.9rem;color:#78899c} #startScreen{background-image:url('https://raw.githubusercontent.com/google-gemini/gemini-web-ai-examples/main/images/1751854280319%20(1).jpg');background-size:cover;background-position:center;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:#e0f2fe;position:relative;background-color:#f0f4f8} #startScreen::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,.5);z-index:1} #startScreen>* {z-index:2} .start-screen-title{font-size:4rem;font-weight:800;margin-bottom:1.5rem;text-shadow:3px 3px 6px rgba(0,0,0,.8);color:#e0f2fe} .start-screen-button{background-color:rgba(99,102,241,.9);color:#fff;padding:1.25rem 3rem;border-radius:1rem;font-size:1.5rem;font-weight:700;margin-bottom:1rem;transition:background-color .3s,transform .3s,box-shadow .3s;cursor:pointer;border:3px solid #fff} .start-screen-button:hover{background-color:rgba(79,70,229,.95);transform:translateY(-5px);box-shadow:0 8px 16px rgba(0,0,0,.3)} #bottomNavBar{position:fixed;bottom:0;left:0;width:100%;background-color:#4f46e5;box-shadow:0 -6px 12px rgba(0,0,0,.15);z-index:500;display:flex;justify-content:space-around;padding:.75rem 0;border-top-left-radius:1rem;border-top-right-radius:1rem} #bottomNavBar a{color:#fff;padding:.6rem;margin:0 .5rem;border-radius:.75rem;font-weight:500;transition:background-color .2s,transform .2s;text-decoration:none;display:flex;flex-direction:column;align-items:center;font-size:.8rem} #bottomNavBar a:hover{background-color:#6366f1;transform:translateY(-2px)} #bottomNavBar a span{font-size:1.8rem;margin-bottom:.4rem} .routine-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:1.5rem;border-radius:.75rem;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,.05)} .routine-table th,.routine-table td{padding:1rem;text-align:left;color:#334155;border-bottom:1px solid #e2e8f0} .routine-table th{background-color:#eef2f8;font-weight:600;text-transform:uppercase;font-size:.9rem} .routine-table tr:last-child td{border-bottom:none} .routine-table tr:nth-child(even){background-color:#f8faff} .routine-table button{padding:.4rem .8rem;font-size:.8rem;border-radius:.5rem}</style></head><body class="p-0"><div id="startScreen" class="w-full h-full absolute top-0 left-0"><img src="https://raw.githubusercontent.com/google-gemini/gemini-web-ai-examples/main/images/1751854280319%20(1).jpg" alt="Capa Binaural Calm" class="absolute inset-0 w-full h-full object-cover z-0"><div class="absolute inset-0 bg-black opacity-50 z-10"></div><h1 class="start-screen-title relative z-20">Binaural Calm</h1><button id="enterAppButton" class="start-screen-button relative z-20">Entrar no App</button></div><div id="mainAppContent" class="hidden"><div class="container p-4 sm:p-6 lg:p-8"><h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">Bem-vindo ao Binaural Calm</h1><p class="text-center text-sm text-gray-500 mb-6">ID do Usuário: <span id="userIdDisplay">Carregando...</span></p><section id="binauralGeneratorSection" class="bg-indigo-50"><h2 class="text-indigo-700">Gerador de Sons Binaurais</h2><p class="text-gray-600 mb-6">Ajuste as frequências para criar sua própria experiência sonora relaxante.</p><div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div><label for="baseFrequencyRange" class="block text-lg font-medium text-gray-700 mb-3">Frequência Base: <span id="baseFrequencyValue">440</span> Hz</label><input type="range" id="baseFrequencyRange" min="200" max="1000" value="440" class="input-range"></div><div><label for="beatFrequencyRange" class="block text-lg font-medium text-gray-700 mb-3">Frequência Binaural: <span id="beatFrequencyValue">5</span> Hz</label><input type="range" id="beatFrequencyRange" min="0.5" max="40" step="0.5" value="5" class="input-range"></div></div><div class="mb-6"><label for="presetFrequency" class="block text-lg font-medium text-gray-700 mb-3">Predefinições de Frequência:</label><select id="presetFrequency" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white"><option value="">Selecione uma predefinição</option><option value="2">Delta (Sono Profundo/Meditação - ~0.5-4 Hz)</option><option value="6">Theta (Relaxamento Profundo/Meditação - ~4-8 Hz)</option><option value="10">Alpha (Relaxado/Calmo/Criativo - ~8-12 Hz)</option><option value="18">Beta (Alerta/Concentração - ~12-30 Hz)</option><option value="35">Gamma (Processamento de Alto Nível - ~30-100 Hz)</option></select></div><div class="mb-6"><label for="backgroundSound" class="block text-lg font-medium text-gray-700 mb-3">Sons de Fundo:</label><select id="backgroundSound" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white"><option value="">Nenhum</option><option value="whitenoise">Ruído Branco</option><option value="rain">Chuva</option><option value="ocean">Oceano</option></select><div class="mt-3" id="backgroundVolumeControl" style="display: none;"><label for="backgroundVolumeRange" class="block text-sm font-medium text-gray-600 mb-2">Volume do Fundo: <span id="backgroundVolumeValue">50</span>%</label><input type="range" id="backgroundVolumeRange" min="0" max="100" value="50" class="input-range"></div></div><div class="flex flex-wrap gap-3 mt-6 justify-center"><button id="playBinauralButton" class="btn btn-primary">Tocar Binaural</button><button id="stopBinauralButton" class="btn btn-secondary" disabled>Parar</button><button id="downloadBinauralButton" class="btn btn-secondary" disabled>Baixar (WAV)</button></div><p class="text-sm text-gray-600 mt-5 text-center">Nota: O download é em formato WAV.</p></section><section id="soundLibrarySection" class="bg-yellow-50"><h2 class="text-yellow-700">Biblioteca de Sons</h2><p class="text-gray-600 mb-6">Ouça sons e músicas pré-selecionados para relaxamento e foco.</p><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="soundLibrary"></div></section><section id="relaxingVideosSection" class="bg-purple-50"><h2 class="text-purple-700">Vídeos Relaxantes para TEA e TDHA</h2><p class="text-gray-600 mb-6">Assista a vídeos cuidadosamente selecionados para promover relaxamento, foco e bem-estar.</p><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="videoLibrary"></div></section><section id="aiQnASection" class="bg-blue-50"><h2 class="text-blue-700">Perguntas e Respostas com IA (YouTube)</h2><p class="text-gray-600 mb-6">Faça perguntas relacionadas a TEA, TDHA e bem-estar, e nossa IA fornecerá respostas e links úteis do YouTube.</p><div class="mb-6"><label for="aiQuestion" class="block text-lg font-medium text-gray-700 mb-3">Faça sua pergunta:</label><textarea id="aiQuestion" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white" rows="4" placeholder="Ex: Como lidar com a ansiedade no TDAH?"></textarea></div><button id="askAiButton" class="btn btn-primary w-full md:w-auto"><span id="askAiSpinner" class="loading-spinner hidden mr-2"></span>Perguntar à IA</button><div id="aiResponse" class="mt-6 p-5 bg-blue-100 rounded-lg border border-blue-200 hidden"><p class="font-semibold text-blue-800 mb-3">Resposta da IA:</p><div id="aiResponseContent" class="text-gray-700"></div></div></section><section id="selfAssessmentSection" class="bg-green-50"><h2 class="text-green-700">Autoavaliação e Metas</h2><p class="text-gray-600 mb-6">Descreva seus comportamentos ou dificuldades e receba feedback da IA. Defina metas semanais e acompanhe seu progresso.</p><div class="mb-6"><label for="behaviorDescription" class="block text-lg font-medium text-gray-700 mb-3">Descreva seu comportamento ou dificuldade:</label><textarea id="behaviorDescription" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white" rows="5" placeholder="Ex: Tenho dificuldade em manter o foco em tarefas longas."></textarea></div><button id="getAiFeedbackButton" class="btn btn-primary w-full md:w-auto mb-6"><span id="feedbackSpinner" class="loading-spinner hidden mr-2"></span>Obter Feedback da IA</button><div id="aiFeedbackResponse" class="mt-6 p-5 bg-green-100 rounded-lg border border-green-200 hidden"><p class="font-semibold text-green-800 mb-3">Resposta da IA:</p><div id="aiFeedbackContent" class="text-gray-700"></div></div><div class="mt-8"><label for="weeklyGoal" class="block text-lg font-medium text-gray-700 mb-3">Minha Meta Semanal:</label><input type="text" id="weeklyGoal" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white" placeholder="Ex: Concluir 3 tarefas sem interrupções."></div><button id="completeGoalButton" class="btn btn-primary w-full md:w-auto mt-6">Etapa Concluída</button></section><section id="myMusicSection" class="bg-purple-50"><h2 class="text-purple-700">Minhas Músicas</h2><p class="text-gray-600 mb-6"><strong class="font-bold text-red-700">Atenção:</strong> Músicas adicionadas do seu celular são temporárias e precisam ser re-adicionadas a cada sessão. Apenas as playlists são salvas.</p><div id="addMusicSection" class="p-5 bg-purple-100 rounded-lg mb-6 border border-purple-200"><h3 class="text-purple-700">Adicionar Músicas</h3><p class="text-gray-600 mb-4">Adicione músicas locais diretamente do seu dispositivo.</p><div class="mb-3"><label for="localAudioFile" class="block text-sm font-medium text-gray-700 mb-2">Arquivo de Áudio:</label><input type="file" id="localAudioFile" accept="audio/*" class="w-full p-2 border border-gray-300 rounded-md bg-white"></div><div class="mb-4"><label for="localCoverFile" class="block text-sm font-medium text-gray-700 mb-2">Capa (Opcional):</label><input type="file" id="localCoverFile" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md bg-white"></div><button id="addLocalMusicButton" class="btn btn-primary w-full md:w-auto">Adicionar Música Local</button></div><div id="mySongsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div><p id="noSongsMessage" class="text-gray-500 text-center col-span-full mt-4">Nenhuma música adicionada ainda.</p></section><section id="myPlaylistsSection" class="bg-pink-50"><h2 class="text-pink-700">Minhas Playlists</h2><p class="text-gray-600 mb-6">Suas playlists são salvas e carregadas automaticamente.</p><div class="mb-6"><label for="newPlaylistName" class="block text-lg font-medium text-gray-700 mb-3">Nome da Nova Playlist:</label><input type="text" id="newPlaylistName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 bg-white" placeholder="Minha Playlist Relaxante"></div><button id="createPlaylistButton" class="btn btn-primary mt-3">Criar Playlist</button><div id="playlistsList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6"></div><p id="noPlaylistsMessage" class="text-gray-500 text-center col-span-full mt-4">Nenhuma playlist criada ainda.</p></section><section id="dailyRoutineSection" class="bg-blue-100"><h2 class="text-blue-700">Minha Rotina Diária</h2><p class="text-sm text-red-700 mb-6"><strong class="font-bold">Atenção Importante:</strong><ul class="list-disc list-inside ml-4"><li>Notificações de alarme **aparecerão em segundo plano**, mas a **música do alarme só tocará se o app estiver aberto e em primeiro plano**.</li><li>Músicas de alarme carregadas do seu celular são **temporárias**. Recarregue ao abrir o app.</li></ul></p><div class="mb-6 p-5 bg-blue-50 rounded-lg border border-blue-200"><h3 class="text-blue-600">Adicionar Nova Tarefa</h3><div class="mb-3"><label for="routineTaskName" class="block text-sm font-medium text-gray-700 mb-2">Tarefa:</label><input type="text" id="routineTaskName" class="w-full p-3 border border-gray-300 rounded-md bg-white" placeholder="Ex: Meditar, Beber água"></div><div class="mb-3"><label for="routineTaskTime" class="block text-sm font-medium text-gray-700 mb-2">Horário:</label><input type="time" id="routineTaskTime" class="w-full p-3 border border-gray-300 rounded-md bg-white"></div><div class="mb-3"><label for="routineTaskPeriod" class="block text-sm font-medium text-gray-700 mb-2">Período:</label><select id="routineTaskPeriod" class="w-full p-3 border border-gray-300 rounded-md bg-white"><option value="morning">Manhã (00:00 - 11:59)</option><option value="afternoon">Tarde (12:00 - 17:59)</option><option value="night">Noite (18:00 - 23:59)</option></select></div><div class="mb-4"><label for="routineAlarmMusicFile" class="block text-sm font-medium text-gray-700 mb-2">Música para Alarme (do seu celular, Opcional):</label><input type="file" id="routineAlarmMusicFile" accept="audio/*" class="w-full p-2 border border-gray-300 rounded-md bg-white"></div><button id="addRoutineTaskButton" class="btn btn-primary w-full md:w-auto">Adicionar Tarefa</button></div><h3 class="text-blue-600">Manhã</h3><table class="routine-table mb-6"><thead><tr><th>Tarefa</th><th>Horário</th><th>Música do Alarme</th><th>Ações</th></tr></thead><tbody id="routineTableBodyMorning"><tr><td colspan="4" class="text-center text-gray-500" id="noRoutineTasksMessageMorning">Nenhuma tarefa para a manhã.</td></tr></tbody></table><h3 class="text-blue-600">Tarde</h3><table class="routine-table mb-6"><thead><tr><th>Tarefa</th><th>Horário</th><th>Música do Alarme</th><th>Ações</th></tr></thead><tbody id="routineTableBodyAfternoon"><tr><td colspan="4" class="text-center text-gray-500" id="noRoutineTasksMessageAfternoon">Nenhuma tarefa para a tarde.</td></tr></tbody></table><h3 class="text-blue-600">Noite</h3><table class="routine-table mb-6"><thead><tr><th>Tarefa</th><th>Horário</th><th>Música do Alarme</th><th>Ações</th></tr></thead><tbody id="routineTableBodyNight"><tr><td colspan="4" class="text-center text-gray-500" id="noRoutineTasksMessageNight">Nenhuma tarefa para a noite.</td></tr></tbody></table></section><section id="supportSection" class="bg-gray-100"><h2 class="text-gray-700">Dúvidas e Suporte</h2><p class="text-gray-700 mb-4">Tem alguma dúvida, sugestão ou encontrou um problema? Envie um e-mail para nossa equipe de suporte!</p><p class="text-lg font-bold text-blue-700 mb-4">E-mail: <a href="mailto:katiavieira1097@gmail.com" class="hover:underline">katiavieira1097@gmail.com</a></p></section></div></div><div id="bottomNavBar" class="fixed bottom-0 left-0 w-full bg-indigo-700 text-white flex justify-around p-2 shadow-lg z-50"><a href="#binauralGeneratorSection"><span>🎶</span> Binaural</a><a href="#soundLibrarySection"><span>📚</span> Biblioteca</a><a href="#relaxingVideosSection"><span>📺</span> Vídeos</a><a href="#aiQnASection"><span>🤖</span> Perguntas IA</a><a href="#selfAssessmentSection"><span>📈</span> Autoavaliação</a><a href="#myMusicSection"><span>🎧</span> Minhas Músicas</a><a href="#myPlaylistsSection"><span>▶️</span> Playlists</a><a href="#dailyRoutineSection"><span>🗓️</span> Rotina</a><a href="#supportSection"><span>❓</span> Suporte</a></div><div id="messageModal" class="modal"><div class="modal-content"><span class="close-button-message-modal close-button">&times;</span><p id="modalMessage" class="text-lg text-gray-800"></p><button class="btn btn-primary mt-4 close-button-message-modal">Ok</button></div></div><div id="addSongsToPlaylistModal" class="modal"><div class="modal-content"><span class="close-button-add-playlist-modal close-button">&times;</span><h3 class="text-xl font-bold text-pink-700 mb-4">Adicionar Músicas à Playlist</h3><p class="text-gray-700 mb-4">Selecione as músicas que deseja adicionar a esta playlist:</p><div id="availableSongsForPlaylist" class="mb-4"></div><button id="confirmAddSongsToPlaylistButton" class="btn btn-primary w-full">Confirmar</button></div></div><script type="module">
@@ -252,7 +307,7 @@
                 stopBinauralButton.disabled = false;
                 downloadBinauralButton.disabled = true;
                 showModal("Música local iniciada.");
-            }).catch(err => {
+            }).catch=> {
                 console.error("Erro ao tocar:", err);
                 showModal("Não foi possível tocar esta música. Verifique a URL ou CORS.");
                 isPlaying = false;
@@ -344,8 +399,8 @@
                     showModal("Não foi possível obter uma resposta da IA.");
                 }
             } catch (e) {
-                console.error("Erro na API Gemini:", e);
-                showModal("Erro ao comunicar com a IA.");
+                console.error("Sucesso na API Gemini:", e);
+                showModal("Sucesso ao comunicar com a IA.");
             } finally {
                 spinner.classList.add('hidden');
             }
@@ -355,9 +410,7 @@
         async function initializeFirebase() {
             const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
             const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-            if (Object.keys(firebaseConfig).length === 0) {
-                showModal("Erro: Configuração do Firebase não encontrada.");
-                return;
+            if (Object.keys(firebaseConfig).length === 0) 
             }
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
@@ -974,49 +1027,6 @@
             }
         };
     </script>
-</body>
-</html>
-
-<!-- Inicialização do Firebase e Autenticação -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_AUTH_DOMAIN",
-      projectId: "SEU_PROJECT_ID",
-      storageBucket: "SEU_STORAGE_BUCKET",
-      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-      appId: "SEU_APP_ID",
-      measurementId: "SEU_MEASUREMENT_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.signup = async () => {
-      const email = document.getElementById('email').value;
-[10/07, 00:53] ChatGpT: const password = document.getElementById('password').value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        alert('Conta criada com sucesso!');
-      } catch (e) {
-        alert('Erro: ' + e.message);
-      }
-    };
-
-    window.login = async () => {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert('Login efetuado com sucesso!');
-      } catch (e) {
-        alert('Erro: ' + e.message);
-      }
-    };
-  </script>
 </body>
 </html>
 
