@@ -3,975 +3,649 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest"
-    href="manifest.json">
-  <title>Binaural Calm</title>
+    <title>Aplicativo Binaural para Autismo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body{font-family:'Inter',sans-serif;background-color:#f0f4f8;color:#334155;padding-top:0;padding-bottom:5rem;min-height:100vh;overflow-x:hidden} .container{max-width:960px;margin:0 auto;padding:1.5rem;background-color:transparent} section{background-color:#fff;border-radius:1.5rem;box-shadow:0 12px 24px rgba(0,0,0,.1);margin-bottom:2.5rem;padding:2rem;border:1px solid #e2e8f0} h1,h2,h3{color:#253b59;font-weight:700} h1{font-size:2.5rem;margin-bottom:1.5rem;text-align:center} h2{font-size:2rem;margin-bottom:1.25rem} h3{font-size:1.5rem;margin-bottom:1rem} p{color:#64748b;line-height:1.6} .btn{padding:.8rem 1.8rem;border-radius:.75rem;font-weight:600;transition:all .3s ease;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;border:none} .btn-primary{background-color:#6366f1;color:#fff;box-shadow:0 4px 8px rgba(99,102,241,.3)} .btn-primary:hover{background-color:#4f46e5;transform:translateY(-2px);box-shadow:0 6px 12px rgba(79,70,229,.4)} .btn-secondary{background-color:#eef2f8;color:#475569;border:1px solid #cbd5e1} .btn-secondary:hover{background-color:#dbe7f5;transform:translateY(-2px);box-shadow:0 2px 4px rgba(0,0,0,.1)} .btn:disabled{opacity:.6;cursor:not-allowed} .input-range{width:100%;height:10px;background:#e2e8f0;border-radius:5px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer} .input-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;background:#6366f1;border-radius:50%;cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.2);border:3px solid #fff} .input-range::-webkit-slider-thumb:active{cursor:grabbing} .input-range::-moz-range-thumb{width:24px;height:24px;background:#6366f1;border-radius:50%;cursor:grab;box-shadow:0 2px 6px rgba(0,0,0,.2);border:3px solid #fff} .input-range::-moz-range-thumb:active{cursor:grabbing} .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,.5);display:flex;justify-content:center;align-items:center;padding:1rem} .modal-content{background-color:#fff;padding:2rem;border-radius:1.5rem;box-shadow:0 10px 20px rgba(0,0,0,.2);width:90%;max-width:450px;text-align:center;position:relative} .close-button{position:absolute;top:1rem;right:1rem;color:#aaa;font-size:2rem;font-weight:700;cursor:pointer;transition:color .2s} .close-button:hover,.close-button:focus{color:#666} .loading-spinner{border:4px solid rgba(99,102,241,.2);border-left-color:#6366f1;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite} @keyframes spin{to{transform:rotate(360deg)}} .sound-card,.video-card{background-color:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:1.25rem;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;border:1px solid #e2e8f0} .sound-card:hover,.video-card:hover{transform:translateY(-5px);box-shadow:0 8px 16px rgba(0,0,0,.12)} .sound-card-icon{font-size:3rem;margin-bottom:.75rem;color:#4f46e5} .video-card iframe{width:100%;aspect-ratio:16/9;border-radius:.75rem;margin-bottom:1rem;border:none} .video-card h3{font-size:1.25rem;margin-bottom:.5rem} .video-card p{font-size:.9rem;color:#78899c} #startScreen{background-image:url('https://raw.githubusercontent.com/google-gemini/gemini-web-ai-examples/main/images/1751854280319%20(1).jpg');background-size:cover;background-position:center;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:#e0f2fe;position:relative;background-color:#f0f4f8} #startScreen::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,.5);z-index:1} #startScreen>* {z-index:2} .start-screen-title{font-size:4rem;font-weight:800;margin-bottom:1.5rem;text-shadow:3px 3px 6px rgba(0,0,0,.8);color:#e0f2fe} .start-screen-button{background-color:rgba(99,102,241,.9);color:#fff;padding:1.25rem 3rem;border-radius:1rem;font-size:1.5rem;font-weight:700;margin-bottom:1rem;transition:background-color .3s,transform .3s,box-shadow .3s;cursor:pointer;border:3px solid #fff} .start-screen-button:hover{background-color:rgba(79,70,229,.95);transform:translateY(-5px);box-shadow:0 8px 16px rgba(0,0,0,.3)} #bottomNavBar{position:fixed;bottom:0;left:0;width:100%;background-color:#4f46e5;box-shadow:0 -6px 12px rgba(0,0,0,.15);z-index:500;display:flex;justify-content:space-around;padding:.75rem 0;border-top-left-radius:1rem;border-top-right-radius:1rem} #bottomNavBar a{color:#fff;padding:.6rem;margin:0 .5rem;border-radius:.75rem;font-weight:500;transition:background-color .2s,transform .2s;text-decoration:none;display:flex;flex-direction:column;align-items:center;font-size:.8rem} #bottomNavBar a:hover{background-color:#6366f1;transform:translateY(-2px)} #bottomNavBar a span{font-size:1.8rem;margin-bottom:.4rem} .routine-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:1.5rem;border-radius:.75rem;overflow:hidden;box-shadow:0 4px 8px rgba(0,0,0,.05)} .routine-table th,.routine-table td{padding:1rem;text-align:left;color:#334155;border-bottom:1px solid #e2e8f0} .routine-table th{background-color:#eef2f8;font-weight:600;text-transform:uppercase;font-size:.9rem} .routine-table tr:last-child td{border-bottom:none} .routine-table tr:nth-child(even){background-color:#f8faff} .routine-table button{padding:.4rem .8rem;font-size:.8rem;border-radius:.5rem}</style></head><body class="p-0"><div id="startScreen" class="w-full h-full absolute top-0 left-0"><img src="https://raw.githubusercontent.com/google-gemini/gemini-web-ai-examples/main/images/1751854280319%20(1).jpg" alt="Capa Binaural Calm" class="absolute inset-0 w-full h-full object-cover z-0"><div class="absolute inset-0 bg-black opacity-50 z-10"></div><h1 class="start-screen-title relative z-20">Binaural Calm</h1><button id="enterAppButton" class="start-screen-button relative z-20">Entrar no App</button></div><div id="mainAppContent" class="hidden"><div class="container p-4 sm:p-6 lg:p-8"><h1 class="text-3xl font-bold text-center mb-6 text-indigo-700">Bem-vindo ao Binaural Calm</h1><p class="text-center text-sm text-gray-500 mb-6">ID do Usuário: <span id="userIdDisplay">Carregando...</span></p><section id="binauralGeneratorSection" class="bg-indigo-50"><h2 class="text-indigo-700">Gerador de Sons Binaurais</h2><p class="text-gray-600 mb-6">Ajuste as frequências para criar sua própria experiência sonora relaxante.</p><div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div><label for="baseFrequencyRange" class="block text-lg font-medium text-gray-700 mb-3">Frequência Base: <span id="baseFrequencyValue">440</span> Hz</label><input type="range" id="baseFrequencyRange" min="200" max="1000" value="440" class="input-range"></div><div><label for="beatFrequencyRange" class="block text-lg font-medium text-gray-700 mb-3">Frequência Binaural: <span id="beatFrequencyValue">5</span> Hz</label><input type="range" id="beatFrequencyRange" min="0.5" max="40" step="0.5" value="5" class="input-range"></div></div><div class="mb-6"><label for="presetFrequency" class="block text-lg font-medium text-gray-700 mb-3">Predefinições de Frequência:</label><select id="presetFrequency" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white"><option value="">Selecione uma predefinição</option><option value="2">Delta (Sono Profundo/Meditação - ~0.5-4 Hz)</option><option value="6">Theta (Relaxamento Profundo/Meditação - ~4-8 Hz)</option><option value="10">Alpha (Relaxado/Calmo/Criativo - ~8-12 Hz)</option><option value="18">Beta (Alerta/Concentração - ~12-30 Hz)</option><option value="35">Gamma (Processamento de Alto Nível - ~30-100 Hz)</option></select></div><div class="mb-6"><label for="backgroundSound" class="block text-lg font-medium text-gray-700 mb-3">Sons de Fundo:</label><select id="backgroundSound" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-white"><option value="">Nenhum</option><option value="whitenoise">Ruído Branco</option><option value="rain">Chuva</option><option value="ocean">Oceano</option></select><div class="mt-3" id="backgroundVolumeControl" style="display: none;"><label for="backgroundVolumeRange" class="block text-sm font-medium text-gray-600 mb-2">Volume do Fundo: <span id="backgroundVolumeValue">50</span>%</label><input type="range" id="backgroundVolumeRange" min="0" max="100" value="50" class="input-range"></div></div><div class="flex flex-wrap gap-3 mt-6 justify-center"><button id="playBinauralButton" class="btn btn-primary">Tocar Binaural</button><button id="stopBinauralButton" class="btn btn-secondary" disabled>Parar</button><button id="downloadBinauralButton" class="btn btn-secondary" disabled>Baixar (WAV)</button></div><p class="text-sm text-gray-600 mt-5 text-center">Nota: O download é em formato WAV.</p></section><section id="soundLibrarySection" class="bg-yellow-50"><h2 class="text-yellow-700">Biblioteca de Sons</h2><p class="text-gray-600 mb-6">Ouça sons e músicas pré-selecionados para relaxamento e foco.</p><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="soundLibrary"></div></section><section id="relaxingVideosSection" class="bg-purple-50"><h2 class="text-purple-700">Vídeos Relaxantes para TEA e TDHA</h2><p class="text-gray-600 mb-6">Assista a vídeos cuidadosamente selecionados para promover relaxamento, foco e bem-estar.</p><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="videoLibrary"></div></section><section id="aiQnASection" class="bg-blue-50"><h2 class="text-blue-700">Perguntas e Respostas com IA (YouTube)</h2><p class="text-gray-600 mb-6">Faça perguntas relacionadas a TEA, TDHA e bem-estar, e nossa IA fornecerá respostas e links úteis do YouTube.</p><div class="mb-6"><label for="aiQuestion" class="block text-lg font-medium text-gray-700 mb-3">Faça sua pergunta:</label><textarea id="aiQuestion" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white" rows="4" placeholder="Ex: Como lidar com a ansiedade no TDAH?"></textarea></div><button id="askAiButton" class="btn btn-primary w-full md:w-auto"><span id="askAiSpinner" class="loading-spinner hidden mr-2"></span>Perguntar à IA</button><div id="aiResponse" class="mt-6 p-5 bg-blue-100 rounded-lg border border-blue-200 hidden"><p class="font-semibold text-blue-800 mb-3">Resposta da IA:</p><div id="aiResponseContent" class="text-gray-700"></div></div></section><section id="selfAssessmentSection" class="bg-green-50"><h2 class="text-green-700">Autoavaliação e Metas</h2><p class="text-gray-600 mb-6">Descreva seus comportamentos ou dificuldades e receba feedback da IA. Defina metas semanais e acompanhe seu progresso.</p><div class="mb-6"><label for="behaviorDescription" class="block text-lg font-medium text-gray-700 mb-3">Descreva seu comportamento ou dificuldade:</label><textarea id="behaviorDescription" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white" rows="5" placeholder="Ex: Tenho dificuldade em manter o foco em tarefas longas."></textarea></div><button id="getAiFeedbackButton" class="btn btn-primary w-full md:w-auto mb-6"><span id="feedbackSpinner" class="loading-spinner hidden mr-2"></span>Obter Feedback da IA</button><div id="aiFeedbackResponse" class="mt-6 p-5 bg-green-100 rounded-lg border border-green-200 hidden"><p class="font-semibold text-green-800 mb-3">Resposta da IA:</p><div id="aiFeedbackContent" class="text-gray-700"></div></div><div class="mt-8"><label for="weeklyGoal" class="block text-lg font-medium text-gray-700 mb-3">Minha Meta Semanal:</label><input type="text" id="weeklyGoal" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white" placeholder="Ex: Concluir 3 tarefas sem interrupções."></div><button id="completeGoalButton" class="btn btn-primary w-full md:w-auto mt-6">Etapa Concluída</button></section><section id="myMusicSection" class="bg-purple-50"><h2 class="text-purple-700">Minhas Músicas</h2><p class="text-gray-600 mb-6"><strong class="font-bold text-red-700">Atenção:</strong> Músicas adicionadas do seu celular são temporárias e precisam ser re-adicionadas a cada sessão. Apenas as playlists são salvas.</p><div id="addMusicSection" class="p-5 bg-purple-100 rounded-lg mb-6 border border-purple-200 hidden"><h3 class="text-purple-700">Adicionar Músicas (Recompensa!)</h3><p class="text-gray-600 mb-4">Adicione até ${MAX_SONGS_PER_GOAL} músicas locais após completar uma meta de autoavaliação.</p><div class="mb-3"><label for="localAudioFile" class="block text-sm font-medium text-gray-700 mb-2">Arquivo de Áudio:</label><input type="file" id="localAudioFile" accept="audio/*" class="w-full p-2 border border-gray-300 rounded-md bg-white"></div><div class="mb-4"><label for="localCoverFile" class="block text-sm font-medium text-gray-700 mb-2">Capa (Opcional):</label><input type="file" id="localCoverFile" accept="image/*" class="w-full p-2 border border-gray-300 rounded-md bg-white"></div><button id="addLocalMusicButton" class="btn btn-primary w-full md:w-auto">Adicionar Música Local</button></div><div id="mySongsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div><p id="noSongsMessage" class="text-gray-500 text-center col-span-full mt-4">Nenhuma música adicionada ainda.</p></section><section id="myPlaylistsSection" class="bg-pink-50"><h2 class="text-pink-700">Minhas Playlists</h2><p class="text-gray-600 mb-6">Suas playlists são salvas e carregadas automaticamente.</p><div class="mb-6"><label for="newPlaylistName" class="block text-lg font-medium text-gray-700 mb-3">Nome da Nova Playlist:</label><input type="text" id="newPlaylistName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 bg-white" placeholder="Minha Playlist Relaxante"></div><button id="createPlaylistButton" class="btn btn-primary mt-3">Criar Playlist</button><div id="playlistsList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6"></div><p id="noPlaylistsMessage" class="text-gray-500 text-center col-span-full mt-4">Nenhuma playlist criada ainda.</p></section><section id="dailyRoutineSection" class="bg-blue-100"><h2 class="text-blue-700">Minha Rotina Diária</h2><p class="text-sm text-red-700 mb-6"><strong class="font-bold">Atenção Importante:</strong><ul class="list-disc list-inside ml-4"><li>Notificações de alarme **aparecerão em segundo plano**, mas a **música do alarme só tocará se o app estiver aberto e em primeiro plano**.</li><li>Músicas de alarme carregadas do seu celular são **temporárias**. Recarregue ao abrir o app.</li></ul></p><div class="mb-6 p-5 bg-blue-50 rounded-lg border border-blue-200"><h3 class="text-blue-600">Adicionar Nova Tarefa</h3><div class="mb-3"><label for="routineTaskName" class="block text-sm font-medium text-gray-700 mb-2">Tarefa:</label><input type="text" id="routineTaskName" class="w-full p-3 border border-gray-300 rounded-md bg-white" placeholder="Ex: Meditar, Beber água"></div><div class="mb-3"><label for="routineTaskTime" class="block text-sm font-medium text-gray-700 mb-2">Horário:</label><input type="time" id="routineTaskTime" class="w-full p-3 border border-gray-300 rounded-md bg-white"></div><div class="mb-3"><label for="routineTaskPeriod" class="block text-sm font-medium text-gray-700 mb-2">Período:</label><select id="routineTaskPeriod" class="w-full p-3 border border-gray-300 rounded-md bg-white"><option value="morning">Manhã (00:00 - 11:59)</option><option value="afternoon">Tarde (12:00 - 17:59)</option><option value="night">Noite (18:00 - 23:59)</option></select></div><div class="mb-4"><label for="routineAlarmMusicFile" class="block text-sm font-medium text-gray-700 mb-2">Música para Alarme (do seu celular, Opcional):</label><input type="file" id="routineAlarmMusicFile" accept="audio/*" class="w-full p-2 border border-gray-300 rounded-md bg-white"></div><button id="addRoutineTaskButton" class="btn btn-primary w-full md:w-auto">Adicionar Tarefa</button></div><h3 class="text-blue-600">Manhã</h3><table class="routine-table mb-6"><thead><tr><th>Tarefa</th><th>Horário</th><th>Música do Alarme</th><th>Ações</th></tr></thead><tbody id="routineTableBodyMorning"><tr><td colspan="4" class="text-center text-gray-500" id="noRoutineTasksMessageMorning">Nenhuma tarefa para a manhã.</td></tr></tbody></table><h3 class="text-blue-600">Tarde</h3><table class="routine-table mb-6"><thead><tr><th>Tarefa</th><th>Horário</th><th>Música do Alarme</th><th>Ações</th></tr></thead><tbody id="routineTableBodyAfternoon"><tr><td colspan="4" class="text-center text-gray-500" id="noRoutineTasksMessageAfternoon">Nenhuma tarefa para a tarde.</td></tr></tbody></table><h3 class="text-blue-600">Noite</h3><table class="routine-table mb-6"><thead><tr><th>Tarefa</th><th>Horário</th><th>Música do Alarme</th><th>Ações</th></tr></thead><tbody id="routineTableBodyNight"><tr><td colspan="4" class="text-center text-gray-500" id="noRoutineTasksMessageNight">Nenhuma tarefa para a noite.</td></tr></tbody></table></section><section id="supportSection" class="bg-gray-100"><h2 class="text-gray-700">Dúvidas e Suporte</h2><p class="text-gray-700 mb-4">Tem alguma dúvida, sugestão ou encontrou um problema? Envie um e-mail para nossa equipe de suporte!</p><p class="text-lg font-bold text-blue-700 mb-4">E-mail: <a href="mailto:katiavieira1097@gmail.com" class="hover:underline">katiavieira1097@gmail.com</a></p></section></div></div><div id="bottomNavBar" class="fixed bottom-0 left-0 w-full bg-indigo-700 text-white flex justify-around p-2 shadow-lg z-50"><a href="#binauralGeneratorSection"><span>🎶</span> Binaural</a><a href="#soundLibrarySection"><span>📚</span> Biblioteca</a><a href="#relaxingVideosSection"><span>📺</span> Vídeos</a><a href="#aiQnASection"><span>🤖</span> Perguntas IA</a><a href="#selfAssessmentSection"><span>📈</span> Autoavaliação</a><a href="#myMusicSection"><span>🎧</span> Minhas Músicas</a><a href="#myPlaylistsSection"><span>▶️</span> Playlists</a><a href="#dailyRoutineSection"><span>🗓️</span> Rotina</a><a href="#supportSection"><span>❓</span> Suporte</a></div><div id="messageModal" class="modal"><div class="modal-content"><span class="close-button-message-modal close-button">&times;</span><p id="modalMessage" class="text-lg text-gray-800"></p><button class="btn btn-primary mt-4 close-button-message-modal">Ok</button></div></div><div id="addSongsToPlaylistModal" class="modal"><div class="modal-content"><span class="close-button-add-playlist-modal close-button">&times;</span><h3 class="text-xl font-bold text-pink-700 mb-4">Adicionar Músicas à Playlist</h3><p class="text-gray-700 mb-4">Selecione as músicas que deseja adicionar a esta playlist:</p><div id="availableSongsForPlaylist" class="mb-4"></div><button id="confirmAddSongsToPlaylistButton" class="btn btn-primary w-full">Confirmar</button></div></div><script type="module">
-    import { getFirestore, doc, addDoc, collection, onSnapshot, query, orderBy, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"
-        let audioContext, oscillatorLeft, oscillatorRight, gainNodeLeft, gainNodeRight, isPlaying = false, currentPlayingAudio = null, currentPlaylistPlaying = null, currentPlaylistIndex = 0, alarmTimeouts = {};
-        let backgroundAudio = null, backgroundGainNode = null;
-        const MAX_SONGS_PER_GOAL = 5; // Max local songs user can add per completed goal
+    <!-- Manifest.json embutido -->
+    <link rel="manifest" href="data:application/json;base64,eyJvbmFtZSI6IkFwcCBkZSBTb25zIEJpbmF1cmFpcyIsInNob3J0X25hbWUiOiJTb25zIEJpbmF1cmFpcyIsImRlc2NyaXB0aW9uIjoiQXBsaWNhdGl2byBwYXJhIGdlcmFyIHNvbnMgYmluYXVyYWlzIGUgb2F4aWxpYXIgbm8gYXV0aXNtby4iLCJzdGFydF91cmwiOi4iLCJkaXNwbGF5IjoidXNlci1pbnN0YWxsYWJsZSIsImJhY2tncm91bmRfY29sb3IiOiIjZWZmNmZmIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzE5MngxOTIvNDc0N0ZGL0ZGRkZGRj90ZXh0PUFwcCIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9wbmcifSx7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzUxMng1MTIvNDc0N0ZGL0ZGRkZGRj90ZXh0PUFwcCIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9wbmcifV19">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-blue-100">
+    <div id="root"></div>
 
-        // Helper function to get elements by ID
-        const _id = (id) => document.getElementById(id);
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Firebase v8 CDN Links -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-        // UI Elements
-        const startScreen = _id('startScreen'), mainAppContent = _id('mainAppContent'), enterAppButton = _id('enterAppButton');
-        const baseFrequencyRange = _id('baseFrequencyRange'), baseFrequencyValueSpan = _id('baseFrequencyValue'), beatFrequencyRange = _id('beatFrequencyRange'), beatFrequencyValueSpan = _id('beatFrequencyValue'), playBinauralButton = _id('playBinauralButton'), stopBinauralButton = _id('stopBinauralButton'), downloadBinauralButton = _id('downloadBinauralButton');
-        const presetFrequencySelect = _id('presetFrequency');
-        const backgroundSoundSelect = _id('backgroundSound');
-        const backgroundVolumeControl = _id('backgroundVolumeControl');
-        const backgroundVolumeRange = _id('backgroundVolumeRange');
-        const backgroundVolumeValueSpan = _id('backgroundVolumeValue');
+    <script type="text/babel">
+        const AppContext = React.createContext(null);
 
-        const aiQuestionInput = _id('aiQuestion'), askAiButton = _id('askAiButton'), aiResponseDiv = _id('aiResponse'), aiResponseContent = _id('aiResponseContent'), askAiSpinner = _id('askAiSpinner');
-        const behaviorDescriptionInput = _id('behaviorDescription'), getAiFeedbackButton = _id('getAiFeedbackButton'), aiFeedbackResponseDiv = _id('aiFeedbackResponse'), aiFeedbackContent = _id('aiFeedbackContent'), feedbackSpinner = _id('feedbackSpinner');
-        const weeklyGoalInput = _id('weeklyGoal'), completeGoalButton = _id('completeGoalButton');
-        const addMusicSection = _id('addMusicSection'), localAudioFile = _id('localAudioFile'), localCoverFile = _id('localCoverFile'), addLocalMusicButton = _id('addLocalMusicButton'), mySongsList = _id('mySongsList'), noSongsMessage = _id('noSongsMessage');
-        const newPlaylistNameInput = _id('newPlaylistName'), createPlaylistButton = _id('createPlaylistButton'), playlistsList = _id('playlistsList'), noPlaylistsMessage = _id('noPlaylistsMessage'), addSongsToPlaylistModal = _id('addSongsToPlaylistModal'), availableSongsForPlaylist = _id('availableSongsForPlaylist'), confirmAddSongsToPlaylistButton = _id('confirmAddSongsToPlaylistButton');
-        const soundLibraryDiv = _id('soundLibrary');
-        const videoLibraryDiv = _id('videoLibrary');
-        const routineTaskNameInput = _id('routineTaskName'), routineTaskTimeInput = _id('routineTaskTime'), routineTaskPeriodSelect = _id('routineTaskPeriod'), routineAlarmMusicFileInput = _id('routineAlarmMusicFile'), addRoutineTaskButton = _id('addRoutineTaskButton');
-        const routineTableBodyMorning = _id('routineTableBodyMorning'), routineTableBodyAfternoon = _id('routineTableBodyAfternoon'), routineTableBodyNight = _id('routineTableBodyNight');
-        const noRoutineTasksMessageMorning = _id('noRoutineTasksMessageMorning'), noRoutineTasksMessageAfternoon = _id('noRoutineTasksMessageAfternoon'), noRoutineTasksMessageNight = _id('noRoutineTasksMessageNight');
-        const bottomNavBar = _id('bottomNavBar');
+        const AppProvider = ({ children }) => {
+          const [db, setDb] = React.useState(null), [auth, setAuth] = React.useState(null), [userId, setUserId] = React.useState(null), [isAuthReady, setIsAuthReady] = React.useState(false), [loading, setLoading] = React.useState(true), [error, setError] = React.useState(null), [currentUser, setCurrentUser] = React.useState(null);
 
-        let app, db, auth, userId, playlistsCollectionRef, dailyRoutinesCollectionRef;
-        let songsAddedThisGoal = 0, allUserSongs = [], allUserPlaylists = [], allDailyRoutines = [];
-        let routineAlarmMusicUrls = {}; // Stores URL.createObjectURL for local alarm music (temporary)
+          const startAudioContext = async () => { if (Tone.context.state !== 'running') { try { await Tone.start(); } catch (e) { console.error("Error resuming Tone.js audio context:", e); } } };
 
-        // --- Modal Functions ---
-        window.closeModal = (id) => _id(id).style.display = 'none';
-        function showModal(msg, id = 'messageModal') {
-            const modal = _id(id);
-            if (id === 'messageModal') modal.querySelector('#modalMessage').textContent = msg;
-            modal.style.display = 'flex';
-        }
-        function showScreen(id) {
-            _id('startScreen').classList.add('hidden');
-            _id('mainAppContent').classList.add('hidden');
-            _id(id).classList.remove('hidden');
-        }
-
-        // --- Audio Context and Binaural Sound Generation ---
-        function createAudioContext() {
-            if (!audioContext || audioContext.state === 'closed') {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-        
-        function generateWhiteNoise(durationSeconds, sampleRate) {
-            const numSamples = durationSeconds * sampleRate;
-            const audioBuffer = audioContext.createBuffer(1, numSamples, sampleRate);
-            const output = audioBuffer.getChannelData(0);
-            for (let i = 0; i < numSamples; i++) {
-                output[i] = Math.random() * 2 - 1; // Generates random values between -1 and 1
-            }
-            return audioBuffer;
-        }
-
-        function playBinauralSound() {
-            stopAllAudio(); 
-            createAudioContext();
-
-            const baseF = parseFloat(baseFrequencyRange.value);
-            const beatF = parseFloat(beatFrequencyRange.value);
-
-            // Binaural beats setup
-            oscillatorLeft = audioContext.createOscillator();
-            oscillatorLeft.type = 'sine';
-            oscillatorLeft.frequency.setValueAtTime(baseF, audioContext.currentTime);
-            gainNodeLeft = audioContext.createGain();
-            gainNodeLeft.gain.value = 0.5;
-            oscillatorLeft.connect(gainNodeLeft);
-            const panNodeLeft = audioContext.createStereoPanner();
-            panNodeLeft.pan.setValueAtTime(-1, audioContext.currentTime); // Left channel
-            gainNodeLeft.connect(panNodeLeft);
-            panNodeLeft.connect(audioContext.destination);
-
-            oscillatorRight = audioContext.createOscillator();
-            oscillatorRight.type = 'sine';
-            oscillatorRight.frequency.setValueAtTime(baseF + beatF, audioContext.currentTime);
-            gainNodeRight = audioContext.createGain();
-            gainNodeRight.gain.value = 0.5;
-            oscillatorRight.connect(gainNodeRight);
-            const panNodeRight = audioContext.createStereoPanner();
-            panNodeRight.pan.setValueAtTime(1, audioContext.currentTime); // Right channel
-            gainNodeRight.connect(panNodeRight);
-            panNodeRight.connect(audioContext.destination);
-
-            oscillatorLeft.start();
-            oscillatorRight.start();
-
-            // Background sound setup
-            const selectedBackgroundSound = backgroundSoundSelect.value;
-            if (selectedBackgroundSound) {
-                backgroundVolumeControl.style.display = 'block';
-                if (selectedBackgroundSound === 'whitenoise') {
-                    const whiteNoiseBuffer = generateWhiteNoise(60, audioContext.sampleRate); // 60 seconds of white noise
-                    const source = audioContext.createBufferSource();
-                    source.buffer = whiteNoiseBuffer;
-                    source.loop = true;
-                    backgroundGainNode = audioContext.createGain(); // Create and store gain node
-                    backgroundGainNode.gain.value = parseFloat(backgroundVolumeRange.value) / 100;
-                    source.connect(backgroundGainNode);
-                    backgroundGainNode.connect(audioContext.destination);
-                    source.start();
-                    backgroundAudio = source; // Store source node to stop
-                } else if (selectedBackgroundSound === 'rain') {
-                    backgroundAudio = new Audio('https://freesound.org/data/previews/270/270005_4938661-lq.mp3'); // Public domain rain sound
-                    backgroundAudio.loop = true;
-                    backgroundAudio.volume = parseFloat(backgroundVolumeRange.value) / 100;
-                    backgroundAudio.play().catch(e => console.error("Erro ao tocar som de fundo (chuva):", e));
-                    backgroundGainNode = null; // Not applicable for HTMLAudioElement
-                } else if (selectedBackgroundSound === 'ocean') {
-                    backgroundAudio = new Audio('https://freesound.org/data/previews/270/270006_4938661-lq.mp3'); // Public domain ocean sound
-                    backgroundAudio.loop = true;
-                    backgroundAudio.volume = parseFloat(backgroundVolumeRange.value) / 100;
-                    backgroundAudio.play().catch(e => console.error("Erro ao tocar som de fundo (oceano):", e));
-                    backgroundGainNode = null; // Not applicable for HTMLAudioElement
-                }
-            } else {
-                backgroundVolumeControl.style.display = 'none';
-            }
-
-            isPlaying = true;
-            playBinauralButton.disabled = true;
-            stopBinauralButton.disabled = false;
-            downloadBinauralButton.disabled = false;
-            showModal(`Sons binaurais iniciados: Base ${baseF} Hz, Batida ${beatF} Hz. ${selectedBackgroundSound ? `Com som de fundo: ${selectedBackgroundSound}.` : ''}`);
-        }
-
-        function stopBinauralSound() {
-            if (!isPlaying) return;
-
-            if (oscillatorLeft) { oscillatorLeft.stop(); oscillatorLeft.disconnect(); oscillatorLeft = null; }
-            if (oscillatorRight) { oscillatorRight.stop(); oscillatorRight.disconnect(); oscillatorRight = null; }
-            if (gainNodeLeft) gainNodeLeft.disconnect(); if (gainNodeRight) gainNodeRight.disconnect();
-            
-            if (backgroundAudio) { // Stop background audio
-                if (backgroundAudio.stop) { // If AudioBufferSourceNode
-                    backgroundAudio.stop();
-                    backgroundAudio.disconnect();
-                    if (backgroundGainNode) backgroundGainNode.disconnect();
-                } else if (backgroundAudio.pause) { // If HTMLAudioElement
-                    backgroundAudio.pause();
-                    backgroundAudio.currentTime = 0;
-                }
-                backgroundAudio = null;
-                backgroundGainNode = null;
-            }
-
-            if (audioContext && audioContext.state !== 'closed') audioContext.close().then(() => { audioContext = null; });
-            isPlaying = false;
-            playBinauralButton.disabled = false;
-            stopBinauralButton.disabled = true;
-            downloadBinauralButton.disabled = true;
-            showModal("Sons binaurais parados.");
-        }
-
-        async function downloadBinauralAudio() {
-            if (!audioContext) { showModal("Nenhum som binaural para baixar. Toque o som primeiro."); return; }
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const sampleRate = ctx.sampleRate, duration = 10, numFrames = sampleRate * duration;
-            const buffer = ctx.createBuffer(2, numFrames, sampleRate);
-            const baseF = parseFloat(baseFrequencyRange.value), beatF = parseFloat(beatFrequencyRange.value);
-            const chLeft = buffer.getChannelData(0), chRight = buffer.getChannelData(1);
-            for (let i = 0; i < numFrames; i++) { const time = i / sampleRate; chLeft[i] = Math.sin(2 * Math.PI * baseF * time) * 0.5; chRight[i] = Math.sin(2 * Math.PI * (baseF + beatF) * time) * 0.5; }
-            const wavBlob = bufferToWav(buffer);
-            const url = URL.createObjectURL(wavBlob); const a = document.createElement('a'); a.href = url; a.download = `binaural-${baseF}Hz-${beatF}beat.wav`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-            showModal(`Áudio binaural (${baseF}Hz + ${beatF}Hz) baixado!`);
-        }
-
-        function bufferToWav(buffer) {
-            const numCh = buffer.numberOfChannels, sr = buffer.sampleRate, format = 1, bd = 16;
-            let interleaved = []; for (let i = 0; i < buffer.getChannelData(0).length; i++) { for (let ch = 0; ch < numCh; ch++) { interleaved.push(buffer.getChannelData(ch)[i]); } }
-            const dv = new DataView(new ArrayBuffer(44 + interleaved.length * 2)); let off = 0;
-            function ws(v, o, s) { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
-            function u16(v, o, val) { v.setUint16(o, val, true); }
-            function u32(v, o, val) { v.setUint32(o, val, true); }
-            ws(dv, off, 'RIFF'); off += 4; u32(dv, off, 36 + interleaved.length * 2); off += 4; ws(dv, off, 'WAVE'); off += 4;
-            ws(dv, off, 'fmt '); off += 4; u32(dv, off, 16); off += 4; u16(dv, off, format); off += 2; u16(dv, off, numCh); off += 2; u32(dv, off, sr); off += 4; u32(dv, off, sr * numCh * (bd / 8)); off += 4; u16(dv, off, numCh * (bd / 8)); off += 2; u16(dv, off, bd); off += 2;
-            ws(dv, off, 'data'); off += 4; u32(dv, off, interleaved.length * 2); off += 4;
-            for (let i = 0; i < interleaved.length; i++, off += 2) { const s = Math.max(-1, Math.min(1, interleaved[i])); dv.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true); }
-            return new Blob([dv], { type: 'audio/wav' });
-        }
-
-        function playSound(url) {
-            stopAllAudio(); // Stop any currently playing audio
-            if (!url) {
-                showModal("URL de áudio não fornecida.");
-                return;
-            }
-            currentPlayingAudio = new Audio(url);
-            currentPlayingAudio.volume = 0.5; // Default volume
-            currentPlayingAudio.play().then(() => {
-                isPlaying = true;
-                playBinauralButton.disabled = true;
-                stopBinauralButton.disabled = false;
-                downloadBinauralButton.disabled = true;
-                showModal("Música iniciada.");
-            }).catch(err => {
-                console.error("Erro ao tocar:", err);
-                showModal("Não foi possível tocar esta música. Verifique a URL ou CORS.");
-                isPlaying = false;
-                playBinauralButton.disabled = false;
-                stopBinauralButton.disabled = true;
-            });
-        }
-
-        function playUserLocalSong(url) {
-            stopAllAudio(); // Stop any currently playing audio
-            if (!url) {
-                showModal("URL de áudio local não fornecida.");
-                return;
-            }
-            currentPlayingAudio = new Audio(url);
-            currentPlayingAudio.volume = 0.5; // Default volume
-            currentPlayingAudio.play().then(() => {
-                isPlaying = true;
-                playBinauralButton.disabled = true;
-                stopBinauralButton.disabled = false;
-                downloadBinauralButton.disabled = true;
-                showModal("Música local iniciada.");
-            }).catch(err => {
-                console.error("Erro ao tocar:", err);
-                showModal("Não foi possível tocar esta música. Verifique a URL ou CORS.");
-                isPlaying = false;
-                playBinauralButton.disabled = false;
-                stopBinauralButton.disabled = true;
-            });
-        }
-
-        async function playPlaylist(id) {
-            stopAllAudio(); // Stop any currently playing audio
-            const pl = allUserPlaylists.find(p => p.id === id);
-            if (!pl || pl.songs.length === 0) {
-                showModal("Playlist vazia ou não encontrada.");
-                return;
-            }
-            currentPlaylistPlaying = pl;
-            currentPlaylistIndex = 0;
-            playNextSongInPlaylist();
-        }
-
-        function playNextSongInPlaylist() {
-            if (!currentPlaylistPlaying || currentPlaylistIndex >= currentPlaylistPlaying.songs.length) {
-                showModal("Fim da playlist.");
-                currentPlaylistPlaying = null;
-                currentPlaylistIndex = 0;
-                stopAllAudio();
-                return;
-            }
-            const song = allUserSongs.find(s => s.id === currentPlaylistPlaying.songs[currentPlaylistIndex]);
-            if (song && song.audioFileUrl) {
-                playUserLocalSong(song.audioFileUrl);
-                currentPlayingAudio.onended = () => {
-                    currentPlaylistIndex++;
-                    playNextSongInPlaylist();
-                };
-                showModal(`Tocando: ${currentPlaylistPlaying.name} - ${song.name || 'Música Local'}`);
-            } else {
-                showModal(`Música na playlist (ID: ${currentPlaylistPlaying.songs[currentPlaylistIndex]}) não encontrada. Pulando.`);
-                currentPlaylistIndex++;
-                playNextSongInPlaylist();
-            }
-        }
-
-        function stopAllAudio() {
-            if (oscillatorLeft) { oscillatorLeft.stop(); oscillatorLeft.disconnect(); oscillatorLeft = null; }
-            if (oscillatorRight) { oscillatorRight.stop(); oscillatorRight.disconnect(); oscillatorRight = null; }
-            if (gainNodeLeft) gainNodeLeft.disconnect(); if (gainNodeRight) gainNodeRight.disconnect();
-            if (currentPlayingAudio) { currentPlayingAudio.pause(); currentPlayingAudio.currentTime = 0; currentPlayingAudio = null; }
-            if (backgroundAudio) { // Stop background audio
-                if (backgroundAudio.stop) { // If AudioBufferSourceNode
-                    backgroundAudio.stop();
-                    backgroundAudio.disconnect();
-                    if (backgroundGainNode) backgroundGainNode.disconnect();
-                } else if (backgroundAudio.pause) { // If HTMLAudioElement
-                    backgroundAudio.pause();
-                    backgroundAudio.currentTime = 0;
-                }
-                backgroundAudio = null;
-                backgroundGainNode = null;
-            }
-            if (audioContext && audioContext.state !== 'closed') audioContext.close().then(() => { audioContext = null; });
-            isPlaying = false;
-            playBinauralButton.disabled = false;
-            stopBinauralButton.disabled = true;
-            downloadBinauralButton.disabled = true;
-            currentPlaylistPlaying = null;
-            currentPlaylistIndex = 0;
-        }
-
-        // --- Gemini API Calls ---
-        async function callGeminiApi(prompt, spinner, resDiv, resContent) {
-            spinner.classList.remove('hidden');
-            resDiv.classList.add('hidden');
-            resContent.innerHTML = '';
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiKey = ""; // Canvas will provide this in runtime
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+          React.useEffect(() => {
             try {
-                const res = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await res.json();
-                if (result.candidates && result.candidates[0]?.content?.parts[0]?.text) {
-                    resContent.innerHTML = result.candidates[0].content.parts[0].text.replace(/(https?:\/\/[^\s]+)/g, (url) => `<a href="${url}" target="_blank" class="text-indigo-600 hover:underline">${url}</a>`);
-                    resDiv.classList.remove('hidden');
-                } else {
-                    showModal("Não foi possível obter uma resposta da IA.");
+              const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+              const app = firebase.initializeApp(firebaseConfig);
+              const firestoreDb = app.firestore();
+              const firebaseAuth = app.auth();
+              setDb(firestoreDb); setAuth(firebaseAuth);
+              const unsubscribe = firebaseAuth.onAuthStateChanged(async (user) => {
+                setCurrentUser(user);
+                if (user) setUserId(user.uid);
+                else {
+                  try {
+                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                    if (initialAuthToken) { await firebaseAuth.signInWithCustomToken(initialAuthToken); setUserId(firebaseAuth.currentUser?.uid); }
+                    else { await firebaseAuth.signInAnonymously(); setUserId(firebaseAuth.currentUser?.uid); }
+                    setCurrentUser(firebaseAuth.currentUser);
+                  } catch (e) { console.error("Erro ao autenticar:", e); setError("Erro ao autenticar. Faça login ou crie uma conta."); setUserId(null); }
                 }
-            } catch (e) {
-                console.error("Erro na API Gemini:", e);
-                showModal("Erro ao comunicar com a IA.");
-            } finally {
-                spinner.classList.add('hidden');
-            }
-        }
-
-        // --- Firebase Initialization and Auth ---
-        async function initializeFirebase() {
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-            if (Object.keys(firebaseConfig).length === 0) {
-                showModal("Erro: Configuração do Firebase não encontrada.");
-                return;
-            }
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    _id('userIdDisplay').textContent = user.email || user.uid;
-                } else {
-                    userId = crypto.randomUUID(); // Fallback for unauthenticated users
-                    _id('userIdDisplay').textContent = 'Não Autenticado';
-                    try {
-                        await signInAnonymously(auth); 
-                        userId = auth.currentUser?.uid || crypto.randomUUID(); 
-                        _id('userIdDisplay').textContent = auth.currentUser?.email || auth.currentUser?.uid || 'Anônimo';
-                    } catch (e) {
-                        console.error("Erro na autenticação Firebase:", e);
-                        showModal("Erro ao autenticar. Funcionalidades de salvamento limitadas.");
-                    }
-                }
-                // Initialize Firestore collection references after auth state is determined
-                playlistsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/playlists`);
-                dailyRoutinesCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/dailyRoutines`);
-                
-                // Load data from Firestore
-                setupPlaylistsListener();
-                setupDailyRoutinesListener();
-            });
-        }
-        
-        // --- My Music Section (Local Files - Temporary) ---
-        function addLocalMusic() {
-            const audioFile = localAudioFile.files[0];
-            const coverFile = localCoverFile.files[0];
-
-            if (!audioFile) {
-                showModal("Selecione um arquivo de áudio.");
-                return;
-            }
-
-            if (songsAddedThisGoal >= MAX_SONGS_PER_GOAL) {
-                showModal(`Você já adicionou ${MAX_SONGS_PER_GOAL} músicas para esta meta. Complete outra meta para adicionar mais.`);
-                return;
-            }
-
-            const audioUrl = URL.createObjectURL(audioFile);
-            const coverUrl = coverFile ? URL.createObjectURL(coverFile) : '';
-
-            // Store song data in allUserSongs (in-memory for now, as local files are temporary)
-            allUserSongs.push({
-                id: crypto.randomUUID(),
-                name: audioFile.name.split('.').slice(0, -1).join('.'),
-                artist: 'Local',
-                audioFileUrl: audioUrl,
-                coverUrl: coverUrl,
-                isLocal: true // Mark as local to distinguish from library sounds
-            });
-
-            songsAddedThisGoal++;
-            renderUserSongs();
-            showModal(`Música "${audioFile.name}" adicionada! Você pode adicionar mais ${MAX_SONGS_PER_GOAL - songsAddedThisGoal} músicas para esta meta.`);
-            localAudioFile.value = ''; // Clear input
-            localCoverFile.value = ''; // Clear input
-        }
-
-        function renderUserSongs() {
-            mySongsList.innerHTML = '';
-            if (allUserSongs.length === 0) {
-                noSongsMessage.style.display = 'block';
-            } else {
-                noSongsMessage.style.display = 'none';
-                allUserSongs.forEach(s => {
-                    mySongsList.innerHTML += `
-                        <div class="music-card">
-                            <img src="${s.coverUrl || 'https://placehold.co/100x100/e2e8f0/475569?text=Capa'}" alt="Capa">
-                            <h4>${s.name}</h4>
-                            <p>${s.artist}</p>
-                            <button class="btn btn-primary text-xs py-1 px-2 mt-2 play-user-music-btn" data-song-id="${s.id}">Tocar</button>
-                            <button class="btn btn-secondary text-xs py-1 px-2 mt-2 delete-user-music-btn" data-song-id="${s.id}">Remover</button>
-                        </div>
-                    `;
-                });
-            }
-            // Add event listeners for play and delete buttons
-            document.querySelectorAll('.play-user-music-btn').forEach(b => b.addEventListener('click', e => {
-                const song = allUserSongs.find(s => s.id === e.target.dataset.songId);
-                if (song?.audioFileUrl) {
-                    playUserLocalSong(song.audioFileUrl);
-                } else {
-                    showModal("URL de áudio não encontrada para esta música.");
-                }
-            }));
-            document.querySelectorAll('.delete-user-music-btn').forEach(b => b.addEventListener('click', e => deleteUserSong(e.target.dataset.songId)));
-        }
-
-        async function deleteUserSong(songId) {
-            const initialLength = allUserSongs.length;
-            allUserSongs = allUserSongs.filter(s => s.id !== songId);
-            
-            if (allUserSongs.length < initialLength) {
-                // Update all playlists in Firestore that might contain this song
-                for (const playlist of allUserPlaylists) {
-                    const updatedSongs = playlist.songs.filter(id => id !== songId);
-                    if (updatedSongs.length !== playlist.songs.length) { // If song was in this playlist
-                        try {
-                            await updateDoc(doc(db, `artifacts/${app.options.appId}/users/${userId}/playlists`, playlist.id), {
-                                songs: updatedSongs
-                            });
-                        } catch (e) {
-                            console.error(`Erro ao atualizar playlist ${playlist.id}:`, e);
-                            showModal(`Erro ao remover música da playlist ${playlist.name}.`);
-                        }
-                    }
-                }
-                renderUserSongs(); // Re-render the music list
-                showModal("Música removida com sucesso!");
-            } else {
-                showModal("Música não encontrada para remoção.");
-            }
-        }
-
-        // --- My Playlists Section (Firebase Persistent) ---
-        function setupPlaylistsListener() {
-            if (!playlistsCollectionRef) return; // Ensure collection reference is set
-            // Listen for real-time updates to playlists
-            onSnapshot(query(playlistsCollectionRef, orderBy("createdAt", "desc")), (snap) => {
-                playlistsList.innerHTML = '';
-                allUserPlaylists = []; // Clear existing playlists
-                if (snap.empty) {
-                    noPlaylistsMessage.style.display = 'block';
-                } else {
-                    noPlaylistsMessage.style.display = 'none';
-                    snap.forEach(d => {
-                        const playlistData = d.data();
-                        const pl = { id: d.id, ...playlistData };
-                        allUserPlaylists.push(pl);
-                        playlistsList.innerHTML += `
-                            <div class="bg-white p-4 rounded-lg shadow">
-                                <h4 class="font-semibold text-gray-800 mb-2">${pl.name}</h4>
-                                <p class="text-sm text-gray-600 mb-3">${pl.songs.length} músicas</p>
-                                <button class="btn btn-secondary text-xs py-1 px-2 mr-2 add-to-playlist-btn" data-playlist-id="${pl.id}">Adicionar Músicas</button>
-                                <button class="btn btn-primary text-xs py-1 px-2 play-playlist-btn" data-playlist-id="${pl.id}">Tocar Playlist</button>
-                            </div>
-                        `;
-                    });
-                }
-                // Add event listeners after rendering
-                document.querySelectorAll('.add-to-playlist-btn').forEach(b => b.addEventListener('click', e => openAddSongsToPlaylistModal(e.target.dataset.playlistId)));
-                document.querySelectorAll('.play-playlist-btn').forEach(b => b.addEventListener('click', e => playPlaylist(e.target.dataset.playlistId)));
-            });
-        }
-
-        async function createPlaylist() {
-            const name = newPlaylistNameInput.value.trim();
-            if (!name) {
-                showModal("Digite um nome para a playlist.");
-                return;
-            }
-            if (!userId) {
-                showModal("Erro: Usuário não autenticado. Não é possível criar playlists.");
-                return;
-            }
-            try {
-                // Add a new document to the 'playlists' collection
-                await addDoc(playlistsCollectionRef, {
-                    name: name,
-                    songs: [], // Start with an empty array of song IDs
-                    createdAt: serverTimestamp(), // Firestore timestamp
-                    userId: userId // Store the user ID for security rules
-                });
-                showModal(`Playlist "${name}" criada!`);
-                newPlaylistNameInput.value = ''; // Clear input
-            } catch (e) {
-                console.error("Erro ao criar playlist: ", e);
-                showModal("Erro ao criar a playlist.");
-            }
-        }
-
-        let currentPlaylistIdToAddSongs = null; // To keep track of which playlist to add songs to
-
-        function openAddSongsToPlaylistModal(id) {
-            currentPlaylistIdToAddSongs = id;
-            availableSongsForPlaylist.innerHTML = ''; // Clear previous content
-
-            const playlist = allUserPlaylists.find(p => p.id === id);
-            const playlistSongIds = playlist ? new Set(playlist.songs) : new Set();
-
-            // Combine library sounds and user-added local songs
-            const allAvailableSongs = [
-                ...soundCategories.map(s => ({...s, isLocal: false})), // Library sounds
-                ...allUserSongs // User's local songs
-            ];
-
-            if (allAvailableSongs.length === 0) {
-                availableSongsForPlaylist.innerHTML = '<p class="text-gray-500">Sem músicas disponíveis para adicionar.</p>';
-            } else {
-                allAvailableSongs.forEach(s => {
-                    availableSongsForPlaylist.innerHTML += `
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="song-${s.id}" value="${s.id}" ${playlistSongIds.has(s.id) ? 'checked' : ''}>
-                            <label for="song-${s.id}">${s.name} - ${s.artist || 'Biblioteca'}</label>
-                        </div>
-                    `;
-                });
-            }
-            showModal('', 'addSongsToPlaylistModal'); // Show the modal
-        }
-
-        async function confirmAddSongsToPlaylist() {
-            if (!currentPlaylistIdToAddSongs) return;
-
-            const selectedSongIds = [];
-            document.querySelectorAll('#availableSongsForPlaylist input[type="checkbox"]:checked').forEach(cb => {
-                selectedSongIds.push(cb.value);
-            });
-
-            try {
-                // Update the songs array for the selected playlist in Firestore
-                await updateDoc(doc(db, `artifacts/${app.options.appId}/users/${userId}/playlists`, currentPlaylistIdToAddSongs), {
-                    songs: selectedSongIds
-                });
-                showModal("Músicas adicionadas à playlist!");
-                closeModal('addSongsToPlaylistModal');
-            } catch (e) {
-                console.error("Erro ao adicionar músicas à playlist:", e);
-                showModal("Erro ao adicionar músicas à playlist.");
-            }
-        }
-
-        // --- Sound and Video Libraries ---
-        const soundCategories = [
-            { id: 's1', name: 'Som 1', icon: '🎵', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's2', name: 'Som 2', icon: '🎶', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's3', name: 'Som 3', icon: '🎧', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's4', name: 'Som 4', icon: '🎼', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's5', name: 'Som 5', icon: '🎹', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's6', name: 'Som 6', icon: '🎸', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's7', name: 'Som 7', icon: '🌳', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's8', name: 'Som 8', icon: '💧', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's9', name: 'Som 9', icon: '🦗', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' },
-            { id: 's10', name: 'Som 10', icon: '🌊', audioUrl: 'https://freesound.org/data/previews/270/270006_4938661-lq.mp3', platformUrl: 'https://freesound.org/s/270006/' },
-            { id: 's11', name: 'Som 11', icon: '🌧️', audioUrl: 'https://freesound.org/data/previews/270/270005_4938661-lq.mp3', platformUrl: 'https://freesound.org/s/270005/' },
-            { id: 's12', name: 'Som 12', icon: '🧘', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3', platformUrl: 'https://www.soundhelix.com/audio-examples' }
-        ];
-
-        const relaxingVideos = [
-            { id: 'v1', title: 'Música Calmante e Vídeo Sensorial para Autista em Crise', description: 'Música e visuais calmantes para momentos de crise ou sobrecarga sensorial.', youtubeId: 'ulMGYYpag8A' },
-            { id: 'v2', title: 'Rainbow Curls with Relaxing Music || Autism ADHD Sensory Therapy', description: 'Visuais de líquido colorido com música relaxante para terapia sensorial.', youtubeId: 'Z5539QRtUTc' },
-            { id: 'v3', title: 'Bubbles Therapy with Relaxing Music || Autism ADHD Sensory Therapy', description: 'Terapia de bolhas com música relaxante para acalmar e focar.', youtubeId: '2pXFIYjMXKk' },
-            { id: 'v4', title: 'Música Calmante - Autismo - Asperger - Relaxamento', description: 'Música suave para relaxamento profundo, útil para autismo e asperger.', youtubeId: '7_OQVGVGu0Y' },
-            { id: 'v5', title: 'Ruído Marrom para Estudar: Aumenta a Concentração e o Foco', description: 'Ruído marrom para melhorar a concentração e o foco, ideal para estudos.', youtubeId: 'eOXo9wbFlTY' },
-            { id: 'v6', title: 'Estratégias Para Diminuir a Ansiedade das Crianças com TDAH', description: 'Dicas e técnicas de respiração com música para reduzir a ansiedade em crianças com TDAH.', youtubeId: 'CA-sD10vo2U' }
-        ];
-
-        function renderVideoLibrary() {
-            videoLibraryDiv.innerHTML = '';
-            relaxingVideos.forEach(video => {
-                videoLibraryDiv.innerHTML += `
-                    <div class="video-card">
-                        <iframe src="https://www.youtube.com/embed/${video.youtubeId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-1">${video.title}</h3>
-                        <p class="text-sm text-gray-600">${video.description}</p>
-                    </div>
-                `;
-            });
-        }
-
-        async function downloadSound(audioUrl, fileName) {
-            try {
-                window.open(audioUrl, '_blank');
-                showModal(`O download de "${fileName}" deve ter iniciado ou o arquivo abriu em uma nova aba. Verifique suas notificações ou a pasta de downloads.`);
-            } catch (e) {
-                console.error("Erro ao tentar baixar o som:", e);
-                showModal(`Erro ao tentar baixar o som "${fileName}". Tente novamente. Detalhes: ${e.message || e}`);
-            }
-        }
-
-        function renderSoundLibrary() {
-            soundLibraryDiv.innerHTML = '';
-            soundCategories.forEach(c => {
-                soundLibraryDiv.innerHTML += `
-                    <div class="sound-card">
-                        <div class="sound-card-icon">${c.icon}</div>
-                        <h3 class="text-lg font-semibold text-gray-800">${c.name}</h3>
-                        <button class="btn btn-primary text-xs py-1 px-2 mt-2 play-library-sound-btn" data-audio-url="${c.audioUrl}" data-name="${c.name}">Tocar</button>
-                        <button class="btn btn-secondary text-xs py-1 px-2 mt-2 download-library-sound-btn" data-audio-url="${c.audioUrl}" data-name="${c.name}.mp3">Baixar</button>
-                        <a href="${c.platformUrl}" target="_blank" class="btn btn-secondary text-xs py-1 px-2 mt-2">Acessar Plataforma</a>
-                    </div>
-                `;
-            });
-            document.querySelectorAll('.play-library-sound-btn').forEach(b => b.addEventListener('click', e => {
-                playSound(e.target.dataset.audioUrl);
-                showModal(`Tocando: ${e.target.dataset.name}`);
-            }));
-            document.querySelectorAll('.download-library-sound-btn').forEach(b => b.addEventListener('click', e => downloadSound(e.target.dataset.audioUrl, e.target.dataset.name)));
-        }
-        
-        // --- Daily Routine Section (Firebase Persistent) ---
-        async function addRoutineTask() {
-            const name = routineTaskNameInput.value.trim();
-            const time = routineTaskTimeInput.value;
-            const period = routineTaskPeriodSelect.value;
-            const alarmFile = routineAlarmMusicFileInput.files[0];
-
-            if (!name || !time || !period) {
-                showModal("Preencha tarefa, horário e período.");
-                return;
-            }
-
-            let alarmUrl = null;
-            let alarmName = null;
-            if (alarmFile) {
-                alarmUrl = URL.createObjectURL(alarmFile);
-                alarmName = alarmFile.name;
-            }
-
-            try {
-                const docRef = await addDoc(dailyRoutinesCollectionRef, {
-                    name,
-                    time,
-                    period,
-                    alarmMusicName: alarmName,
-                    createdAt: serverTimestamp(),
-                    userId: userId
-                });
-
-                if (alarmUrl) {
-                    routineAlarmMusicUrls[docRef.id] = { url: alarmUrl, name: alarmName };
-                }
-
-                showModal(`Tarefa "${name}" adicionada!`);
-                routineTaskNameInput.value = '';
-                routineTaskTimeInput.value = '';
-                routineTaskPeriodSelect.value = 'morning';
-                routineAlarmMusicFileInput.value = '';
-            } catch (e) {
-                console.error("Erro ao adicionar tarefa:", e);
-                showModal("Erro ao adicionar a tarefa.");
-            }
-        }
-
-        function setupDailyRoutinesListener() {
-            if (!dailyRoutinesCollectionRef) return;
-            onSnapshot(query(dailyRoutinesCollectionRef, orderBy("time", "asc")), (snap) => {
-                routineTableBodyMorning.innerHTML = '';
-                routineTableBodyAfternoon.innerHTML = '';
-                routineTableBodyNight.innerHTML = '';
-
-                noRoutineTasksMessageMorning.style.display = 'table-row';
-                noRoutineTasksMessageAfternoon.style.display = 'table-row';
-                noRoutineTasksMessageNight.style.display = 'table-row';
-
-                allDailyRoutines = [];
-                let hasMorningTasks = false;
-                let hasAfternoonTasks = false;
-                let hasNightTasks = false;
-
-                snap.forEach(d => {
-                    const routineData = d.data();
-                    const routine = { id: d.id, ...routineData };
-                    allDailyRoutines.push(routine);
-
-                    const alarmDisplayName = routine.alarmMusicName || 'Nenhuma';
-                    const rowContent = `
-                        <td>${routine.name}</td>
-                        <td>${routine.time}</td>
-                        <td>${alarmDisplayName}</td>
-                        <td><button class="btn btn-secondary text-xs delete-routine-btn" data-id="${routine.id}">Excluir</button></td>
-                    `;
-                    let targetBody;
-                    if (routine.period === 'morning') {
-                        targetBody = routineTableBodyMorning;
-                        hasMorningTasks = true;
-                    } else if (routine.period === 'afternoon') {
-                        targetBody = routineTableBodyAfternoon;
-                        hasAfternoonTasks = true;
-                    } else if (routine.period === 'night') {
-                        targetBody = routineTableBodyNight;
-                        hasNightTasks = true;
-                    } else {
-                        console.warn("Período de rotina desconhecido:", routine.period);
-                        return;
-                    }
-                    targetBody.insertRow().innerHTML = rowContent;
-                });
-
-                if (hasMorningTasks) noRoutineTasksMessageMorning.style.display = 'none';
-                if (hasAfternoonTasks) noRoutineTasksMessageAfternoon.style.display = 'none';
-                if (hasNightTasks) noRoutineTasksMessageNight.style.display = 'none';
-
-                scheduleAllRoutineAlarms();
-
-                document.querySelectorAll('.delete-routine-btn').forEach(b => b.addEventListener('click', e => deleteRoutineTask(e.target.dataset.id)));
-            });
-        }
-
-        async function deleteRoutineTask(id) {
-            try {
-                await deleteDoc(doc(dailyRoutinesCollectionRef, id));
-                showModal("Tarefa excluída!");
-                if (alarmTimeouts[id]) {
-                    clearTimeout(alarmTimeouts[id]);
-                    delete alarmTimeouts[id];
-                }
-                if (routineAlarmMusicUrls[id]) {
-                    URL.revokeObjectURL(routineAlarmMusicUrls[id].url);
-                    delete routineAlarmMusicUrls[id];
-                }
-            } catch (e) {
-                console.error("Erro ao excluir tarefa:", e);
-                showModal("Erro ao excluir a tarefa.");
-            }
-        }
-
-        function scheduleAllRoutineAlarms() {
-            for (const id in alarmTimeouts) {
-                clearTimeout(alarmTimeouts[id]);
-            }
-            alarmTimeouts = {};
-
-            const now = new Date();
-
-            allDailyRoutines.forEach(routine => {
-                const [hours, minutes] = routine.time.split(':').map(Number);
-                const alarmDate = new Date();
-                alarmDate.setHours(hours, minutes, 0, 0);
-
-                if (alarmDate < now) {
-                    alarmDate.setDate(alarmDate.getDate() + 1);
-                }
-
-                const timeToAlarm = alarmDate.getTime() - now.getTime();
-
-                if (timeToAlarm > 0) {
-                    alarmTimeouts[routine.id] = setTimeout(() => {
-                        triggerRoutineAlarm(routine);
-                        scheduleNextDayAlarm(routine);
-                    }, timeToAlarm);
-                } else {
-                    scheduleNextDayAlarm(routine);
-                }
-            });
-        }
-
-        function scheduleNextDayAlarm(routine) {
-            const [hours, minutes] = routine.time.split(':').map(Number);
-            const nextAlarmDate = new Date();
-            nextAlarmDate.setHours(hours, minutes, 0, 0);
-            nextAlarmDate.setDate(nextAlarmDate.getDate() + 1);
-
-            const now = new Date();
-            const timeToNextAlarm = nextAlarmDate.getTime() - now.getTime();
-
-            if (timeToNextAlarm > 0) {
-                alarmTimeouts[routine.id] = setTimeout(() => {
-                    triggerRoutineAlarm(routine);
-                    scheduleNextDayAlarm(routine);
-                }, timeToNextAlarm);
-            }
-        }
-
-        async function triggerRoutineAlarm(routine) {
-            if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-                await Notification.requestPermission();
-            }
-
-            if (navigator.serviceWorker && Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification('Binaural Calm - Lembrete', {
-                        body: `É hora de: ${routine.name}!`,
-                        icon: 'https://placehold.co/48x48/6366f1/ffffff?text=BC',
-                        tag: routine.id
-                    });
-                }).catch(error => {
-                    console.error('Service Worker notification error:', error);
-                    new Notification('Binaural Calm - Lembrete', { body: `É hora de: ${routine.name}!`, icon: 'https://placehold.co/48x48/6366f1/ffffff?text=BC' });
-                });
-            } else if (Notification.permission === 'granted') {
-                new Notification('Binaural Calm - Lembrete', { body: `É hora de: ${routine.name}!`, icon: 'https://placehold.co/48x48/6366f1/ffffff?text=BC' });
-            }
-
-            const alarmMusic = routineAlarmMusicUrls[routine.id];
-            if (alarmMusic?.url) { 
-                const audio = new Audio(alarmMusic.url); 
-                audio.volume = 0.7;
-                try {
-                    await audio.play();
-                } catch (e) {
-                    console.error("Erro ao tocar música do alarme (foreground):", e);
-                }
-                setTimeout(() => {
-                    if (!audio.paused) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }
-                }, 15000);
-            } else {
-                console.warn(`Música para alarme (ID: ${routine.id}) não encontrada nesta sessão ou não pode ser tocada em segundo plano.`);
-            }
-        }
-
-        // --- Event Listeners ---
-        enterAppButton.addEventListener('click', () => {
-            showScreen('mainAppContent');
-            initializeFirebase();
-        });
-
-        baseFrequencyRange.addEventListener('input', () => baseFrequencyValueSpan.textContent = baseFrequencyRange.value);
-        beatFrequencyRange.addEventListener('input', () => beatFrequencyValueSpan.textContent = beatFrequencyRange.value);
-        
-        presetFrequencySelect.addEventListener('change', () => {
-            const selectedValue = parseFloat(presetFrequencySelect.value);
-            if (!isNaN(selectedValue)) {
-                beatFrequencyRange.value = selectedValue;
-                beatFrequencyValueSpan.textContent = selectedValue;
-            }
-        });
-
-        backgroundSoundSelect.addEventListener('change', () => {
-            const selectedSound = backgroundSoundSelect.value;
-            if (backgroundAudio) {
-                if (backgroundAudio.stop) { backgroundAudio.stop(); backgroundAudio.disconnect(); if (backgroundGainNode) backgroundGainNode.disconnect(); }
-                else if (backgroundAudio.pause) { backgroundAudio.pause(); backgroundAudio.currentTime = 0; }
-                backgroundAudio = null; backgroundGainNode = null;
-            }
-
-            if (selectedSound) { backgroundVolumeControl.style.display = 'block'; } else { backgroundVolumeControl.style.display = 'none'; }
-        });
-
-        backgroundVolumeRange.addEventListener('input', () => {
-            backgroundVolumeValueSpan.textContent = backgroundVolumeRange.value;
-            if (backgroundAudio) {
-                if (backgroundGainNode) { backgroundGainNode.gain.value = parseFloat(backgroundVolumeRange.value) / 100; }
-                else if (backgroundAudio.volume !== undefined) { backgroundAudio.volume = parseFloat(backgroundVolumeRange.value) / 100; }
-            }
-        });
-
-        playBinauralButton.addEventListener('click', playBinauralSound);
-        stopBinauralButton.addEventListener('click', stopBinauralSound);
-        downloadBinauralButton.addEventListener('click', downloadBinauralAudio);
-
-        askAiButton.addEventListener('click', () => {
-            const question = aiQuestionInput.value.trim();
-            if (question) {
-                callGeminiApi(
-                    `Como um especialista em neurodesenvolvimento e bem-estar, responda à seguinte pergunta de forma concisa e forneça 1-3 links relevantes de vídeos do YouTube que expliquem ou aprofundem o tema. Pergunta: "${question}"`,
-                    askAiSpinner,
-                    aiResponseDiv,
-                    aiResponseContent
-                );
-            } else {
-                showModal("Digite sua pergunta antes de perguntar à IA.");
-            }
-        });
-
-        getAiFeedbackButton.addEventListener('click', () => {
-            const description = behaviorDescriptionInput.value.trim();
-            if (description) {
-                callGeminiApi(
-                    `Como um mentor de bem-estar e desenvolvimento pessoal, analise a seguinte descrição de comportamento/dificuldade e forneça um feedback construtivo, sugerindo 1-2 pontos de melhoria específicos e encorajadores. Descrição: "${description}"`,
-                    feedbackSpinner,
-                    aiFeedbackResponseDiv,
-                    aiFeedbackContent
-                );
-            } else {
-                showModal("Descreva seu comportamento ou dificuldade antes de obter feedback da IA.");
-            }
-        });
-
-        completeGoalButton.addEventListener('click', () => {
-            const goal = weeklyGoalInput.value.trim();
-            if (goal) {
-                showModal(`Parabéns! Meta "${goal}" concluída! Agora você pode adicionar até ${MAX_SONGS_PER_GOAL} músicas locais como recompensa.`);
-                addMusicSection.classList.remove('hidden'); // Show the local music upload section
-                songsAddedThisGoal = 0; // Reset counter for local songs
-                weeklyGoalInput.value = ''; // Clear goal input
-            } else {
-                showModal("Por favor, defina uma meta semanal antes de marcá-la como concluída.");
-            }
-        });
-
-        addLocalMusicButton.addEventListener('click', addLocalMusic);
-        createPlaylistButton.addEventListener('click', createPlaylist);
-        confirmAddSongsToPlaylistButton.addEventListener('click', confirmAddSongsToPlaylist);
-
-        addRoutineTaskButton.addEventListener('click', addRoutineTask);
-
-        document.querySelectorAll('.close-button-message-modal').forEach(b => b.addEventListener('click', () => closeModal('messageModal')));
-        document.querySelectorAll('.close-button-add-playlist-modal').forEach(b => b.addEventListener('click', () => closeModal('addSongsToPlaylistModal')));
-        
-        bottomNavBar.querySelectorAll('a').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop,
-                        behavior: "smooth"
-                    });
-                }
-            });
-        });
-
-        window.addEventListener('beforeunload', () => {
-            if (isPlaying) {
-                stopAllAudio();
-            }
-            for (const id in routineAlarmMusicUrls) {
-                URL.revokeObjectURL(routineAlarmMusicUrls[id].url);
-            }
-        });
-
-        window.onload = () => {
-            playBinauralButton.disabled = false;
-            stopBinauralButton.disabled = true;
-            downloadBinauralButton.disabled = true;
-
-            renderSoundLibrary();
-            renderVideoLibrary();
-            renderUserSongs(); // Render user songs initially
-            // Daily routines and playlists will be rendered by their respective listeners after Firebase init
-
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(`${window.location.origin}/sw.js`)
-                    .then(registration => console.log('Service Worker registered:', registration))
-                    .catch(error => console.error('Service Worker registration failed:', error));
-            }
+                setIsAuthReady(true); setLoading(false);
+              });
+              return () => unsubscribe();
+            } catch (e) { console.error("Erro na inicialização do Firebase:", e); setError("Erro na inicialização do aplicativo."); setLoading(false); }
+          }, []);
+
+          const handleAuthAction = async (action, email, password) => { try { setLoading(true); await (action === 'register' ? auth.createUserWithEmailAndPassword(email, password) : auth.signInWithEmailAndPassword(email, password)); setError(null); } catch (e) { console.error(`Erro no ${action}:`, e); setError(`Erro no ${action}: ` + e.message); } finally { setLoading(false); } };
+          const handleLogin = (email, password) => handleAuthAction('login', email, password);
+          const handleRegister = (email, password) => handleAuthAction('register', email, password);
+          const handleLogout = async () => { try { await auth.signOut(); setUserId(null); setCurrentUser(null); } catch (e) { console.error("Erro ao fazer logout:", e); setError("Erro ao fazer logout: " + e.message); } };
+
+          if (loading) return (<div className="flex items-center justify-center min-h-screen bg-blue-100 text-blue-800">Carregando aplicativo...</div>);
+          if (error) return (<div className="flex items-center justify-center min-h-screen bg-red-100 text-red-800">Erro: {error}</div>);
+          return (<AppContext.Provider value={{ db, auth, userId, isAuthReady, startAudioContext, handleLogin, handleRegister, handleLogout, currentUser }}>{children}</AppContext.Provider>);
         };
+
+        const useAppContext = () => React.useContext(AppContext);
+
+        const AuthScreen = () => {
+          const { handleLogin, handleRegister, loading, error } = useAppContext();
+          const [email, setEmail] = React.useState(''), [password, setPassword] = React.useState(''), [isRegisterMode, setIsRegisterMode] = React.useState(false), [authMessage, setAuthMessage] = React.useState('');
+          React.useEffect(() => { setAuthMessage(error || ''); }, [error]);
+          const handleSubmit = async (e) => { e.preventDefault(); setAuthMessage(''); await (isRegisterMode ? handleRegister(email, password) : handleLogin(email, password)); };
+          return (
+            <div className="flex items-center justify-center min-h-screen bg-blue-100 p-4">
+              <div className="bg-white p-6 sm:p-8 rounded-lg shadow-xl w-full max-w-sm sm:max-w-md">
+                <h2 className="text-2xl sm:text-3xl font-bold text-blue-700 mb-4 sm:mb-6 text-center">{isRegisterMode ? 'Criar Conta' : 'Fazer Login'}</h2>
+                <p className="text-sm sm:text-base text-gray-700 text-center mb-4 sm:mb-6">{isRegisterMode ? 'Crie uma conta para salvar suas configurações e progresso.' : 'Faça login para acessar o aplicativo.'}</p>
+                <form onSubmit={handleSubmit}>
+                  <div className="mb-3 sm:mb-4"><label htmlFor="email" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Email:</label><input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" required className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-sm" /></div>
+                  <div className="mb-4 sm:mb-6"><label htmlFor="password" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Senha:</label><input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" required className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 mb-2 sm:mb-3 leading-tight focus:outline-none focus:shadow-outline text-sm" /></div>
+                  {authMessage && <p className="text-red-500 text-xs sm:text-sm text-center mb-3 sm:mb-4">{authMessage}</p>}
+                  <button type="submit" disabled={loading} className={`w-full px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300`}>{loading ? 'Carregando...' : (isRegisterMode ? 'Registrar' : 'Entrar')}</button>
+                </form>
+                <div className="mt-4 sm:mt-6 text-center"><button onClick={() => setIsRegisterMode(!isRegisterMode)} className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-semibold transition duration-300">{isRegisterMode ? 'Já tem uma conta? Faça login' : 'Não tem uma conta? Crie uma'}</button></div>
+              </div>
+            </div>
+          );
+        };
+
+        const downloadFile = async (url, filename) => {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const blob = await res.blob(), blobUrl = URL.createObjectURL(blob), a = document.createElement('a');
+            a.href = blobUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl); return { success: true };
+          } catch (e) { console.error("Error during download:", e); return { success: false, message: "Erro ao iniciar o download. Tente novamente." }; }
+        };
+
+        const Header = ({ setView }) => {
+          const { handleLogout, currentUser } = useAppContext();
+          return (
+            <header className="bg-blue-700 text-white p-2 sm:p-3 shadow-md rounded-b-lg w-full">
+              <nav className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                {['home', 'binaural', 'routine', 'selfAssessment', 'soundLibrary', 'userPlaylist', 'communication', 'aiHelper'].map(v => (
+                  <button key={v} onClick={() => setView(v)} className="px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm bg-blue-800 hover:bg-blue-900 rounded-md sm:rounded-lg transition duration-300">{v === 'home' ? 'Início' : v === 'binaural' ? 'Gerador Binaural' : v === 'routine' ? 'Rotina Diária' : v === 'selfAssessment' ? 'Autoavaliação' : v === 'soundLibrary' ? 'Biblioteca de Sons' : v === 'userPlaylist' ? 'Minha Playlist' : v === 'communication' ? 'Melhorar Comunicação' : 'Ajuda da IA'}</button>
+                ))}
+                {currentUser && (<button onClick={handleLogout} className="px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm bg-red-700 hover:bg-red-800 rounded-md sm:rounded-lg transition duration-300">Sair</button>)}
+              </nav>
+            </header>
+          );
+        };
+
+        const Home = () => {
+          const { userId, currentUser } = useAppContext();
+          return (
+            <div className="p-4 sm:p-6 text-center bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-3xl font-bold text-blue-700 mb-2 sm:mb-4">Bem-vindo ao App de Sons Binaurais!</h2>
+              <p className="text-sm sm:text-lg text-gray-700 mb-4 sm:mb-6">Este aplicativo foi desenvolvido para ajudar a criar um ambiente sonoro calmante e estruturado. Explore as seções para gerar sons personalizados, organizar sua rotina e acompanhar seu bem-estar.</p>
+              {userId && (<p className="text-xs sm:text-sm text-gray-500">Seu ID de Usuário: <span className="font-mono break-all">{userId}</span></p>)}
+              {currentUser && currentUser.email && (<p className="text-xs sm:text-sm text-gray-500">Logado como: <span className="font-mono break-all">{currentUser.email}</span></p>)}
+            </div>
+          );
+        };
+
+        const BinauralGenerator = () => {
+          const { db, userId, isAuthReady, startAudioContext } = useAppContext();
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+          const [behavior, setBehavior] = React.useState(''), [trigger, setTrigger] = React.useState(''), [frequencyDiff, setFrequencyDiff] = React.useState(5), [baseFrequency, setBaseFrequency] = React.useState(220), [isPlaying, setIsPlaying] = React.useState(false), [player, setPlayer] = React.useState(null), [message, setMessage] = React.useState(''), [userSounds, setUserSounds] = React.useState([]), [editingSound, setEditingSound] = React.useState(null), [showUpgradeModal, setShowUpgradeModal] = React.useState(false), [showPixInfo, setShowPixInfo] = React.useState(false);
+
+          React.useEffect(() => {
+            if (!isAuthReady || !db || !userId) return;
+            const soundsColRef = db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`);
+            const unsub = soundsColRef.onSnapshot((snap) => setUserSounds(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))), (e) => { console.error("Erro ao buscar sons binaurais:", e); setMessage("Erro ao carregar seus sons."); });
+            return () => unsub();
+          }, [db, userId, isAuthReady, appId]);
+
+          const createBinauralPlayer = (diff, base) => {
+            const masterGain = new Tone.Gain(0.5).toDestination(), filter = new Tone.Filter(8000, "lowpass").connect(masterGain), reverb = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(filter); reverb.generate();
+            const osc1 = new Tone.Oscillator({ frequency: base, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(reverb);
+            const osc2 = new Tone.Oscillator({ frequency: base + diff, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(reverb);
+            setPlayer({ osc1, osc2, masterGain, filter, reverb }); return { osc1, osc2, masterGain, filter, reverb };
+          };
+
+          const playSound = async () => {
+            await startAudioContext();
+            if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); }
+            const newPlayer = createBinauralPlayer(frequencyDiff, baseFrequency); newPlayer.osc1.start(); newPlayer.osc2.start();
+            setIsPlaying(true); setMessage('Som binaural tocando...');
+          };
+          const stopSound = () => {
+            if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); setPlayer(null); }
+            setIsPlaying(false); setMessage('Som parado.');
+          };
+          const handleDownloadBinaural = async () => {
+            await startAudioContext();
+            const offlineCtx = new Tone.OfflineContext(10, 44100); Tone.setContext(offlineCtx);
+            const mg = new Tone.Gain(0.5).toDestination(), f = new Tone.Filter(8000, "lowpass").connect(mg), r = new Tone.Reverb({ decay: 1, wet: 0.1 }).connect(f); r.generate();
+            const o1 = new Tone.Oscillator({ frequency: baseFrequency, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(r);
+            const o2 = new Tone.Oscillator({ frequency: baseFrequency + frequencyDiff, type: "sine", envelope: { attack: 0.5, decay: 0.1, sustain: 1, release: 1.0 } }).connect(r);
+            o1.start(0); o2.start(0); o1.stop(offlineCtx.duration); o2.stop(offlineCtx.duration);
+            try {
+              const buffer = await offlineCtx.render(), audioBlob = bufferToWave(buffer.getChannelData(0), buffer.length, buffer.sampleRate);
+              const filename = `som_binaural_${baseFrequency}Hz_diff${frequencyDiff}Hz.wav`, res = await downloadFile(URL.createObjectURL(audioBlob), filename);
+              if (res.success) setMessage("Download do som binaural iniciado!"); else alert(res.message);
+            } catch (e) { console.error("Erro ao renderizar ou baixar som binaural:", e); setMessage("Erro ao baixar o som binaural."); }
+            finally { Tone.setContext(Tone.context); mg.dispose(); f.dispose(); r.dispose(); o1.dispose(); o2.dispose(); }
+          };
+
+          const bufferToWave = (abuffer, len, sampleRate) => {
+            const nC = 1, l = len * nC * 2 + 44, b = new ArrayBuffer(l), v = new DataView(b); let o = 0;
+            ws(v, o, 'RIFF'); o += 4; v.setUint32(o, 36 + len * nC * 2, true); o += 4;
+            ws(v, o, 'WAVE'); o += 4; ws(v, o, 'fmt '); o += 4;
+            v.setUint32(o, 16, true); o += 4; v.setUint16(o, 1, true); o += 2;
+            v.setUint16(o, nC, true); o += 2; v.setUint32(o, sampleRate, true); o += 4;
+            v.setUint32(o, sampleRate * nC * 2, true); o += 4; v.setUint16(o, nC * 2, true); o += 2;
+            v.setUint16(o, 16, true); o += 2; ws(v, o, 'data'); o += 4;
+            v.setUint32(o, len * nC * 2, true); o += 4; f16BPCM(v, o, abuffer);
+            return new Blob([v], { type: 'audio/wav' });
+          };
+          const ws = (v, o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+          const f16BPCM = (o, off, i) => { for (let j = 0; j < i.length; j++, off += 2) { const s = Math.max(-1, Math.min(1, i[j])); o.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7FFF, true); } };
+
+          const handleSaveSound = async () => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            if (!behavior && !trigger) { setMessage("Preencha comportamento ou gatilho."); return; }
+            try {
+              const soundData = { behavior, trigger, frequencyDiff, baseFrequency, timestamp: new Date().toISOString() };
+              if (editingSound) { await db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`).doc(editingSound.id).update(soundData); setMessage("Som modificado!"); setEditingSound(null); }
+              else { await db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`).add(soundData); setMessage("Som salvo!"); if ((await db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`).get()).docs.length >= 5) setShowUpgradeModal(true); }
+              setBehavior(''); setTrigger('');
+            } catch (e) { console.error("Erro ao salvar som:", e); setMessage("Erro ao salvar o som."); }
+          };
+          const handleEditSound = (s) => { setEditingSound(s); setBehavior(s.behavior); setTrigger(s.trigger); setFrequencyDiff(s.frequencyDiff); setBaseFrequency(s.baseFrequency); setMessage("Editando som..."); };
+          const handleDeleteSound = async (sId) => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            try { await db.collection(`artifacts/${appId}/users/${userId}/binauralSounds`).doc(sId).delete(); setMessage("Som excluído!"); }
+            catch (e) { console.error("Erro ao excluir som:", e); setMessage("Erro ao excluir a som."); }
+          };
+          React.useEffect(() => { return () => { if (player) { player.osc1.stop(); player.osc2.stop(); player.osc1.dispose(); player.osc2.dispose(); player.masterGain.dispose(); player.filter.dispose(); player.reverb.dispose(); } Tone.Transport.stop(); Tone.Transport.cancel(); }; }, [player]);
+
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Gerador de Sons Binaurais</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Crie sons personalizados para acalmar durante uma crise, baseados em seu comportamento e gatilhos.</p>
+              <div className="mb-3 sm:mb-4"><label htmlFor="behavior" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Comportamento durante a crise:</label><input type="text" id="behavior" value={behavior} onChange={(e) => setBehavior(e.target.value)} placeholder="Ex: Agitação, choro, isolamento" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" /></div>
+              <div className="mb-3 sm:mb-4"><label htmlFor="trigger" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Gatilhos identificados:</label><input type="text" id="trigger" value={trigger} onChange={(e) => setTrigger(e.target.value)} placeholder="Ex: Ruídos altos, luzes fortes, mudanças de rotina" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" /></div>
+              <div className="mb-3 sm:mb-4"><label htmlFor="baseFrequency" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Frequência Base (Hz): {baseFrequency.toFixed(0)}</label><input type="range" id="baseFrequency" min="100" max="500" value={baseFrequency} onChange={(e) => setBaseFrequency(parseFloat(e.target.value))} className="w-full h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
+              <div className="mb-4 sm:mb-6"><label htmlFor="frequencyDiff" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Diferença de Frequência (Hz): {frequencyDiff.toFixed(1)}</label><input type="range" id="frequencyDiff" min="1" max="10" step="0.1" value={frequencyDiff} onChange={(e) => setFrequencyDiff(parseFloat(e.target.value))} className="w-full h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
+              <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 sm:mb-6">
+                <button onClick={() => isPlaying ? stopSound() : playSound()} className={`px-4 py-2 text-sm sm:px-6 sm:py-3 bg-green-600 text-white font-bold rounded-lg shadow-md ${isPlaying ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'} transition duration-300 flex-grow`}>{isPlaying ? 'Parar e Gerar Novo' : 'Gerar e Tocar Som'}</button>
+                <button onClick={stopSound} disabled={!isPlaying} className={`px-4 py-2 text-sm sm:px-6 sm:py-3 bg-red-600 text-white font-bold rounded-lg shadow-md ${!isPlaying ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'} transition duration-300 flex-grow`}>Parar Som</button>
+                <button onClick={handleSaveSound} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 flex-grow">{editingSound ? 'Modificar Som' : 'Salvar Som'}</button>
+                <button onClick={handleDownloadBinaural} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-purple-600 text-white font-bold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex-grow">Download MP3</button>
+              </div>
+              {message && <p className="text-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{message}</p>}
+              <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Meus Sons Salvos</h3>
+              {userSounds.length === 0 ? (<p className="text-sm text-gray-600">Nenhum som salvo ainda. Crie um acima!</p>) : (
+                <ul className="space-y-2 sm:space-y-3">
+                  {userSounds.map(s => (<li key={s.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div><p className="font-semibold text-blue-800 text-sm sm:text-base">Comportamento: {s.behavior || 'N/A'}</p><p className="text-xs sm:text-sm text-gray-700">Gatilho: {s.trigger || 'N/A'}</p><p className="text-xs text-gray-500">Freq. Base: {s.baseFrequency} Hz, Dif. Freq: {s.frequencyDiff} Hz</p></div>
+                    <div className="flex gap-1 sm:gap-2 mt-2 sm:mt-0">
+                      <button onClick={() => { setFrequencyDiff(s.frequencyDiff); setBaseFrequency(s.baseFrequency); playSound(); }} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-purple-500 text-white rounded-md hover:bg-purple-600">Ouvir</button>
+                      <button onClick={() => handleEditSound(s)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600">Editar</button>
+                      <button onClick={() => handleDeleteSound(s.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
+                    </div>
+                  </li>))}
+                </ul>
+              )}
+              {showUpgradeModal && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white p-5 sm:p-6 rounded-lg shadow-xl text-center w-full max-w-xs sm:max-w-sm mx-auto">
+                    {!showPixInfo ? (<><h3 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Limite Atingido!</h3><p className="text-sm sm:text-lg text-gray-800 mb-4 sm:mb-6">Você atingiu o limite de 5 sons binaurais gratuitos. Para gerar e salvar mais sons, adquira o **Plano Pro** de 500 sons binaurais mensais por R$ 50,00 reais.</p><div className="flex flex-col gap-3 sm:gap-4">
+                      <button onClick={() => setShowPixInfo(true)} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700">Adquira 500 sons binaurais por R$ 50,00 reais</button>
+                      <button onClick={() => setShowUpgradeModal(false)} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-gray-400 text-white font-bold rounded-lg shadow-md hover:bg-gray-500">Voltar</button></div></>) : (
+                      <><h3 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Informações para Pagamento via Pix</h3><p className="text-sm sm:text-lg text-gray-800 mb-3 sm:mb-4">Chave Pix: <span className="font-mono break-all text-green-600">42984242899</span></p><p className="text-sm sm:text-lg text-gray-800 mb-4 sm:mb-6">Envie o comprovante no WhatsApp: <span className="font-mono break-all text-green-600">+55 (42) 84242899</span></p>
+                        <button onClick={() => { setShowUpgradeModal(false); setShowPixInfo(false); }} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button></>)}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const DailyRoutine = () => {
+          const { db, userId, isAuthReady } = useAppContext();
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+          const [morningTasks, setMorningTasks] = React.useState([]), [afternoonTasks, setAfternoonTasks] = React.useState([]), [eveningTasks, setEveningTasks] = React.useState([]), [newTask, setNewTask] = React.useState(''), [newTimeOfDay, setNewTimeOfDay] = React.useState('morning'), [newAlarmTime, setNewAlarmTime] = React.useState(''), [message, setMessage] = React.useState(''), [showAlarmModal, setShowAlarmModal] = React.useState(false), [currentAlarmTask, setCurrentAlarmTask] = React.useState('');
+          const alarmIntervalRef = React.useRef(null);
+
+          React.useEffect(() => {
+            if (!isAuthReady || !db || !userId) return;
+            const routineColRef = db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`);
+            const unsub = routineColRef.onSnapshot((snap) => {
+              const tasksData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              setMorningTasks(tasksData.filter(t => t.timeOfDay === 'morning'));
+              setAfternoonTasks(tasksData.filter(t => t.timeOfDay === 'afternoon'));
+              setEveningTasks(tasksData.filter(t => t.timeOfDay === 'evening'));
+            }, (e) => { console.error("Erro ao buscar rotina diária:", e); setMessage("Erro ao carregar sua rotina."); });
+            return () => unsub();
+          }, [db, userId, isAuthReady, appId]);
+
+          React.useEffect(() => {
+            if (!isAuthReady) return;
+            if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current);
+            alarmIntervalRef.current = setInterval(() => {
+              const now = new Date(), cH = now.getHours(), cM = now.getMinutes();
+              const checkAndTriggerAlarm = (tasks) => {
+                tasks.forEach(t => {
+                  if (t.alarmTime) {
+                    const [aH, aM] = t.alarmTime.split(':').map(Number);
+                    if (cH === aH && cM === aM) {
+                      const lastTriggered = localStorage.getItem(`alarm-${t.id}`);
+                      if (!lastTriggered || (now.getTime() - parseInt(lastTriggered, 10) > 60000)) {
+                        setCurrentAlarmTask(t.task); setShowAlarmModal(true); localStorage.setItem(`alarm-${t.id}`, now.getTime().toString());
+                        new Tone.Synth().toDestination().triggerAttackRelease("C5", "8n");
+                      }
+                    }
+                  }
+                });
+              };
+              checkAndTriggerAlarm(morningTasks); checkAndTriggerAlarm(afternoonTasks); checkAndTriggerAlarm(eveningTasks);
+            }, 5000);
+            return () => { if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current); };
+          }, [morningTasks, afternoonTasks, eveningTasks, isAuthReady]);
+
+          const handleAddTask = async () => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            if (!newTask.trim()) { setMessage("A tarefa não pode estar vazia."); return; }
+            try { await db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`).add({ task: newTask, timeOfDay: newTimeOfDay, alarmTime: newAlarmTime || null, timestamp: new Date().toISOString() }); setNewTask(''); setNewAlarmTime(''); setMessage("Tarefa adicionada!"); }
+            catch (e) { console.error("Erro ao adicionar tarefa:", e); setMessage("Erro ao adicionar a tarefa."); }
+          };
+          const handleDeleteTask = async (tId) => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            try { await db.collection(`artifacts/${appId}/users/${userId}/dailyRoutine`).doc(tId).delete(); setMessage("Tarefa excluída!"); }
+            catch (e) { console.error("Erro ao excluir tarefa:", e); setMessage("Erro ao excluir a tarefa."); }
+          };
+
+          const renderTaskList = (tasks, title) => (
+            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">{title}</h3>
+              {tasks.length === 0 ? (<p className="text-sm text-gray-600">Nenhuma tarefa para {title.toLowerCase()}.</p>) : (
+                <ul className="space-y-1.5 sm:space-y-2">
+                  {tasks.map(t => (<li key={t.id} className="flex justify-between items-center bg-white p-2 sm:p-3 rounded-md shadow-xs">
+                    <span className="text-sm text-gray-800">{t.task} {t.alarmTime && <span className="text-blue-500 text-xs sm:text-sm">({t.alarmTime})</span>}</span>
+                    <button onClick={() => handleDeleteTask(t.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button>
+                  </li>))}
+                </ul>
+              )}
+            </div>
+          );
+
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Rotina Diária</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Organize suas tarefas para manhã, tarde e noite para uma estrutura previsível.</p>
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 border border-blue-200 rounded-lg">
+                <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">Adicionar Nova Tarefa</h3>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3 sm:mb-4">
+                  <input type="text" value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="Descreva a tarefa" className="shadow border rounded w-full sm:w-1/2 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
+                  <input type="time" value={newAlarmTime} onChange={(e) => setNewAlarmTime(e.target.value)} className="shadow border rounded w-full sm:w-1/4 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" title="Definir hora do alarme" />
+                  <select value={newTimeOfDay} onChange={(e) => setNewTimeOfDay(e.target.value)} className="shadow border rounded w-full sm:w-1/4 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm">
+                    <option value="morning">Manhã</option><option value="afternoon">Tarde</option><option value="evening">Noite</option>
+                  </select>
+                </div>
+                <button onClick={handleAddTask} className="px-4 py-2 text-sm sm:px-6 sm:py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 w-full">Adicionar Tarefa</button>
+                {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">{message}</p>}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                {renderTaskList(morningTasks, 'Manhã')}{renderTaskList(afternoonTasks, 'Tarde')}{renderTaskList(eveningTasks, 'Noite')}
+              </div>
+              {showAlarmModal && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white p-5 sm:p-6 rounded-lg shadow-xl text-center w-full max-w-xs sm:max-w-sm mx-auto">
+                    <h3 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">ALARM!</h3><p className="text-lg sm:text-xl text-gray-800 mb-4 sm:mb-6">Hora de: <span className="font-semibold">{currentAlarmTask}</span></p>
+                    <button onClick={() => setShowAlarmModal(false)} className="px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700">Entendi</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const MonthlyProgressChart = () => {
+          const { db, userId, isAuthReady } = useAppContext();
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+          const [crisisData, setCrisisData] = React.useState([]), [message, setMessage] = React.useState('');
+
+          React.useEffect(() => {
+            if (!isAuthReady || !db || !userId) return;
+            const assessmentsColRef = db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`);
+            const unsub = assessmentsColRef.onSnapshot((snap) => {
+              const assessments = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              const monthlyData = {};
+              assessments.forEach(a => {
+                if (a.crisisLevel !== undefined && a.crisisLevel !== null) {
+                  const date = new Date(a.timestamp), mY = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                  monthlyData[mY] = monthlyData[mY] || { month: date.toLocaleString('pt-BR', { month: 'short', year: '2-digit' }), totalCrises: 0, count: 0 };
+                  monthlyData[mY].totalCrises += a.crisisLevel; monthlyData[mY].count++;
+                }
+              });
+              const chartData = Object.keys(monthlyData).map(k => ({ name: monthlyData[k].month, "Nível Médio de Crise": monthlyData[k].totalCrises / monthlyData[k].count })).sort((a, b) => new Date(`1 ${a.name}`) - new Date(`1 ${b.name}`));
+              setCrisisData(chartData); setMessage(chartData.length === 0 ? "Nenhum dado de crise registrado ainda para gerar o gráfico." : "");
+            }, (e) => { console.error("Erro ao buscar dados de crise:", e); setMessage("Erro ao carregar dados de crise para o gráfico."); });
+            return () => unsub();
+          }, [db, userId, isAuthReady, appId]);
+
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg mt-4 sm:mt-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Evolução Mensal das Crises</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Acompanhe a média do nível de suas crises ao longo dos meses.</p>
+              {message && <p className="text-center text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{message}</p>}
+              {crisisData.length > 0 && (
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={crisisData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" tick={{fontSize: 10}} /><YAxis domain={[0, 5]} tick={{fontSize: 10}} />
+                    <Tooltip /><Legend wrapperStyle={{fontSize: '12px'}} /><Line type="monotone" dataKey="Nível Médio de Crise" stroke="#8884d8" activeDot={{ r: 8 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          );
+        };
+
+        const SelfAssessment = () => {
+          const { db, userId, isAuthReady } = useAppContext();
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+          const [assessmentText, setAssessmentText] = React.useState(''), [crisisLevel, setCrisisLevel] = React.useState(3), [assessments, setAssessments] = React.useState([]), [message, setMessage] = React.useState('');
+
+          React.useEffect(() => {
+            if (!isAuthReady || !db || !userId) return;
+            const assessmentsColRef = db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`);
+            const unsub = assessmentsColRef.onSnapshot((snap) => {
+              const assessmentsData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+              assessmentsData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); setAssessments(assessmentsData);
+            }, (e) => { console.error("Erro ao buscar autoavaliações:", e); setMessage("Erro ao carregar suas autoavaliações."); });
+            return () => unsub();
+          }, [db, userId, isAuthReady, appId]);
+
+          const handleSaveAssessment = async () => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            if (!assessmentText.trim()) { setMessage("A autoavaliação não pode estar vazia."); return; }
+            try {
+              const newAssessment = { text: assessmentText, crisisLevel: crisisLevel, timestamp: new Date().toISOString() };
+              await db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`).add(newAssessment);
+              const today = new Date(), cMY = `${today.getFullYear()}-${today.getMonth() + 1}`;
+              const monthlySummaryRef = db.collection(`artifacts/${appId}/users/${userId}/monthlySummaries`).doc(cMY);
+              const docSnap = await monthlySummaryRef.get();
+              let tCL = newAssessment.crisisLevel, aC = 1;
+              if (docSnap.exists) { const d = docSnap.data(); tCL += d.totalCrisisLevel || 0; aC += d.assessmentCount || 0; }
+              await monthlySummaryRef.set({ totalCrisisLevel: tCL, assessmentCount: aC, averageCrisisLevel: tCL / aC, lastUpdated: new Date().toISOString() }, { merge: true });
+              setAssessmentText(''); setCrisisLevel(3); setMessage("Autoavaliação salva!");
+            } catch (e) { console.error("Erro ao salvar autoavaliação:", e); setMessage("Erro ao salvar a autoavaliação."); }
+          };
+          const handleDeleteAssessment = async (aId) => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            try { await db.collection(`artifacts/${appId}/users/${userId}/selfAssessments`).doc(aId).delete(); setMessage("Autoavaliação excluída!"); }
+            catch (e) { console.error("Erro ao excluir autoavaliação:", e); setMessage("Erro ao excluir a autoavaliação."); }
+          };
+          const formatDate = (iso) => new Date(iso).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Autoavaliação</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Acompanhe seu desenvolvimento e bem-estar após ouvir os sons.</p>
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 border border-blue-200 rounded-lg">
+                <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">Registrar Avaliação</h3>
+                <textarea value={assessmentText} onChange={(e) => setAssessmentText(e.target.value)} placeholder="Como você se sente hoje? O que você notou após ouvir os sons?" rows="4" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm mb-3 sm:mb-4"></textarea>
+                <div className="mb-3 sm:mb-4"><label htmlFor="crisisLevel" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Nível da Crise (0=Nenhuma, 5=Muito Alta): {crisisLevel}</label><input type="range" id="crisisLevel" min="0" max="5" step="1" value={crisisLevel} onChange={(e) => setCrisisLevel(parseInt(e.target.value))} className="w-full h-1.5 sm:h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div>
+                <button onClick={handleSaveAssessment} className="px-4 py-2 text-sm sm:px-6 sm:py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 w-full">Salvar Avaliação</button>
+                {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">{message}</p>}
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Minhas Avaliações</h3>
+              {assessments.length === 0 ? (<p className="text-sm text-gray-600">Nenhuma autoavaliação registrada ainda.</p>) : (
+                <ul className="space-y-2 sm:space-y-4">
+                  {assessments.map(a => (<li key={a.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm">
+                    <p className="text-sm sm:text-base text-gray-800 mb-1 sm:mb-2">{a.text}</p><p className="text-xs sm:text-sm text-gray-600">Nível da Crise: {a.crisisLevel !== undefined ? a.crisisLevel : 'N/A'}</p>
+                    <div className="flex justify-between items-center text-xs sm:text-sm text-gray-500 mt-2"><span>{formatDate(a.timestamp)}</span><button onClick={() => handleDeleteAssessment(a.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700">Excluir</button></div>
+                  </li>))}
+                </ul>
+              )}
+              <MonthlyProgressChart />
+            </div>
+          );
+        };
+
+        const SoundLibrary = () => {
+          const { startAudioContext } = useAppContext();
+          const [isPlaying, setIsPlaying] = React.useState(null);
+          const currentPlayerRef = React.useRef(null);
+          const sounds = [
+            { id: 'sh_song1', name: 'SoundHelix Song 1', description: 'Melodia relaxante.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+1', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+            { id: 'sh_song2', name: 'SoundHelix Song 2', description: 'Ritmo suave.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+2', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+            { id: 'sh_song3', name: 'SoundHelix Song 3', description: 'Harmonia tranquila.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+3', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+            { id: 'sh_song4', name: 'SoundHelix Song 4', description: 'Paz e serenidade.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+4', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+            { id: 'sh_song5', name: 'SoundHelix Song 5', description: 'Sons para meditar.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+5', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+            { id: 'sh_song6', name: 'SoundHelix Song 6', description: 'Calma e foco.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+6', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+            { id: 'sh_song7', name: 'SoundHelix Song 7', description: 'Relaxamento profundo.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+7', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+            { id: 'sh_song8', name: 'SoundHelix Song 8', description: 'Ambiente suave.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+8', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+            { id: 'sh_song9', name: 'SoundHelix Song 9', description: 'Tranquilidade sonora.', image: 'https://placehold.co/100x100/FF4747/FFFFFF?text=Song+9', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3' },
+            { id: 'sh_song10', name: 'SoundHelix Song 10', description: 'Sinfonia calma.', image: 'https://placehold.co/100x100/4747FF/FFFFFF?text=Song+10', audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3' },
+          ];
+
+          const playSound = async (s) => { await startAudioContext(); stopCurrentSound(); try { const p = new Tone.Player(s.audioUrl).toDestination(); p.autostart = true; p.loop = true; p.volume.value = -10; currentPlayerRef.current = p; setIsPlaying(s.id); } catch (e) { console.error("Error playing sound:", e); } };
+          const stopCurrentSound = () => { if (currentPlayerRef.current) { currentPlayerRef.current.stop(); currentPlayerRef.current.dispose(); currentPlayerRef.current = null; } setIsPlaying(null); Tone.Transport.stop(); Tone.Transport.cancel(); };
+          React.useEffect(() => { return () => stopCurrentSound(); }, []);
+
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Biblioteca de Sons Instrumentais</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Explore uma variedade de sons instrumentais para promover o relaxamento e o bem-estar.</p>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+                {sounds.map(s => (<div key={s.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-md flex flex-col items-center text-center">
+                  <img src={s.image} alt={`Image of ${s.name}`} className="w-16 h-16 sm:w-24 sm:h-24 rounded-full mb-2 sm:mb-4 object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/CCCCCC/000?text=Erro+Image`; }} />
+                  <h3 className="text-sm sm:text-xl font-semibold text-blue-800 mb-1 sm:mb-2">{s.name}</h3><p className="text-xs sm:text-sm text-gray-700 mb-2 sm:mb-4">{s.description}</p>
+                  <div className="flex flex-col gap-2 w-full">
+                    <button onClick={() => isPlaying === s.id ? stopCurrentSound() : playSound(s)} className={`px-3 py-1 text-xs sm:px-5 sm:py-2 rounded-lg font-bold shadow-md transition duration-300 ${isPlaying === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}>{isPlaying === s.id ? 'Parar' : 'Tocar'}</button>
+                    <a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1 text-xs sm:px-5 sm:py-2 rounded-lg font-bold shadow-md transition duration-300 bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center justify-center">Ouvir no Navegador</a>
+                    <button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-3 py-1 text-xs sm:px-5 sm:py-2 rounded-lg font-bold shadow-md transition duration-300 bg-purple-600 hover:bg-purple-700 text-white inline-flex items-center justify-center">Download MP3</button>
+                  </div>
+                </div>))}
+              </div>
+            </div>
+          );
+        };
+
+        const UserPlaylist = () => {
+          const { db, userId, isAuthReady, startAudioContext } = useAppContext();
+          const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+          const [playlistSongs, setPlaylistSongs] = React.useState([]), [newSongName, setNewSongName] = React.useState(''), [newCoverImage, setNewCoverImage] = React.useState(''), [newAudioUrl, setNewAudioUrl] = React.useState(''), [message, setMessage] = React.useState(''), [isPlaylistUnlocked, setIsPlaylistUnlocked] = React.useState(false), [currentPlayingSong, setCurrentPlayingSong] = React.useState(null);
+          const playerRef = React.useRef(null);
+          const MAX_PLAYLIST_SONGS = 10, CRISIS_LEVEL_GOAL = 2.0;
+
+          React.useEffect(() => {
+            if (!isAuthReady || !db || !userId) return;
+            const playlistColRef = db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`);
+            const unsubPlaylist = playlistColRef.onSnapshot((snap) => setPlaylistSongs(snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))), (e) => { console.error("Erro ao buscar playlist:", e); setMessage("Erro ao carregar sua playlist."); });
+            const checkPlaylistUnlock = async () => {
+              const today = new Date(), pM = today.getMonth() === 0 ? 12 : today.getMonth(), pY = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+              const pMY = `${pY}-${pM}`;
+              const monthlySummaryRef = db.collection(`artifacts/${appId}/users/${userId}/monthlySummaries`).doc(pMY);
+              try {
+                const docSnap = await monthlySummaryRef.get();
+                if (docSnap.exists) {
+                  const d = docSnap.data();
+                  if (d.averageCrisisLevel !== undefined && d.averageCrisisLevel <= CRISIS_LEVEL_GOAL) { setIsPlaylistUnlocked(true); setMessage("Sua playlist está desbloqueada! Parabéns pela sua evolução!"); }
+                  else { setIsPlaylistUnlocked(false); setMessage(`Sua playlist está bloqueada. Média de crise do mês anterior: ${d.averageCrisisLevel.toFixed(1)}. Meta: ${CRISIS_LEVEL_GOAL}.`); }
+                } else { setIsPlaylistUnlocked(false); setMessage("Sua playlist está bloqueada. Registre autoavaliações para acompanhar seu progresso e desbloquear!"); }
+              } catch (e) { console.error("Erro ao verificar meta mensal:", e); setMessage("Erro ao verificar meta mensal para a playlist."); setIsPlaylistUnlocked(false); }
+            };
+            checkPlaylistUnlock();
+            return () => { unsubPlaylist(); if (playerRef.current) { playerRef.current.stop(); playerRef.current.dispose(); playerRef.current = null; } };
+          }, [db, userId, isAuthReady, appId]);
+
+          const handleAddSong = async () => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            if (!isPlaylistUnlocked) { setMessage("A playlist está bloqueada. Alcance a meta mensal para desbloquear!"); return; }
+            if (playlistSongs.length >= MAX_PLAYLIST_SONGS) { setMessage(`Você atingiu o limite de ${MAX_PLAYLIST_SONGS} músicas na playlist.`); return; }
+            if (!newSongName.trim()) { setMessage("O nome da música não pode estar vazio."); return; }
+            try { await db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`).add({ name: newSongName, coverImage: newCoverImage || 'https://placehold.co/100x100/CCCCCC/000?text=Sem+Capa', audioUrl: newAudioUrl || '', timestamp: new Date().toISOString() }); setNewSongName(''); setNewCoverImage(''); setNewAudioUrl(''); setMessage("Música adicionada à playlist!"); }
+            catch (e) { console.error("Erro ao adicionar música:", e); setMessage("Erro ao adicionar a música."); }
+          };
+          const handleDeleteSong = async (sId) => {
+            if (!db || !userId || !isAuthReady) { setMessage("Erro: Usuário não autenticado ou Firebase não inicializado."); return; }
+            try { if (currentPlayingSong && currentPlayingSong.id === sId) stopPlayingSong(); await db.collection(`artifacts/${appId}/users/${userId}/userPlaylist`).doc(sId).delete(); setMessage("Música excluída da playlist!"); }
+            catch (e) { console.error("Erro ao excluir música:", e); setMessage("Erro ao excluir a música."); }
+          };
+          const playSong = async (s) => {
+            await startAudioContext(); stopPlayingSong();
+            if (!s.audioUrl || s.audioUrl.trim() === '') { setMessage("Esta música não tem uma URL de áudio válida para tocar. Por favor, edite-a e adicione uma URL de áudio hospedada."); return; }
+            try { playerRef.current = new Tone.Player(s.audioUrl).toDestination(); playerRef.current.autostart = true; playerRef.current.loop = true; playerRef.current.volume.value = -10; setCurrentPlayingSong(s); setMessage(`Tocando: ${s.name}`); }
+            catch (e) { console.error("Erro ao tocar música:", e); setMessage(`Erro ao tocar ${s.name}. Verifique a URL do áudio.`); }
+          };
+          const stopPlayingSong = () => { if (playerRef.current) { playerRef.current.stop(); playerRef.current.dispose(); playerRef.current = null; } setCurrentPlayingSong(null); setMessage('Música parada.'); };
+
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Minha Playlist Favorita</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Adicione até {MAX_PLAYLIST_SONGS} músicas favoritas. Desbloqueie esta funcionalidade mantendo seu nível médio de crise abaixo de {CRISIS_LEVEL_GOAL} no mês anterior (registrado na Autoavaliação).</p>
+              {!isPlaylistUnlocked && (<div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md" role="alert"><p className="font-bold">Playlist Bloqueada</p><p className="text-sm">Para desbloquear, sua média de nível de crise do mês anterior precisa ser de {CRISIS_LEVEL_GOAL} ou menos. Continue usando a Autoavaliação!</p></div>)}
+              <div className={`mb-4 sm:mb-6 p-3 sm:p-4 border border-blue-200 rounded-lg ${!isPlaylistUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <h3 className="text-lg sm:text-xl font-semibold text-blue-700 mb-2 sm:mb-3">Adicionar Nova Música</h3>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3 sm:mb-4">
+                  <input type="text" value={newSongName} onChange={(e) => setNewSongName(e.target.value)} placeholder="Nome da Música" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
+                  <input type="text" value={newCoverImage} onChange={(e) => setNewCoverImage(e.target.value)} placeholder="URL da Imagem de Capa (opcional)" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
+                  <input type="text" value={newAudioUrl} onChange={(e) => setNewAudioUrl(e.target.value)} placeholder="URL do Áudio (MP3 hospedado)" disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className="shadow border rounded w-full sm:w-1/3 py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm" />
+                </div>
+                <button onClick={handleAddSong} disabled={!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS} className={`px-4 py-2 text-sm sm:px-6 sm:py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md ${!isPlaylistUnlocked || playlistSongs.length >= MAX_PLAYLIST_SONGS ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300 w-full`}>Adicionar Música à Playlist</button>
+                {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">{message}</p>}
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Minhas Músicas</h3>
+              {playlistSongs.length === 0 ? (<p className="text-sm text-gray-600">Nenhuma música na playlist ainda.</p>) : (
+                <ul className="space-y-2 sm:space-y-3">
+                  {playlistSongs.map(s => (<li key={s.id} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div className="flex items-center gap-3"><img src={s.coverImage} alt={`Capa de ${s.name}`} className="w-12 h-12 sm:w-16 sm:h-16 rounded-md object-cover" onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/64x64/CCCCCC/000?text=Sem+Capa`; }} /><div><p className="font-semibold text-blue-800 text-sm sm:text-base">{s.name}</p><p className="text-xs text-gray-500">Adicionado em: {new Date(s.timestamp).toLocaleDateString('pt-BR')}</p></div></div>
+                    <div className="flex gap-1 sm:gap-2 mt-2 sm:mt-0">
+                      <button onClick={() => currentPlayingSong && currentPlayingSong.id === s.id ? stopPlayingSong() : playSong(s)} className={`px-2 py-0.5 text-xs sm:px-3 sm:py-1 rounded-md font-bold text-sm transition duration-300 ${currentPlayingSong && currentPlayingSong.id === s.id ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}>{currentPlayingSong && currentPlayingSong.id === s.id ? 'Parar' : 'Tocar'}</button>
+                      {s.audioUrl && s.audioUrl.trim() !== '' && (<><a href={s.audioUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300">Ouvir no Navegador</a><button onClick={async () => { const res = await downloadFile(s.audioUrl, `${s.name}.mp3`); if (!res.success) alert(res.message); }} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-300">Download</button></>)}
+                      <button onClick={() => handleDeleteSong(s.id)} className="px-2 py-0.5 text-xs sm:px-3 sm:py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition duration-300">Excluir</button>
+                    </div>
+                  </li>))}
+                </ul>
+              )}
+            </div>
+          );
+        };
+
+        const CommunicationImprovement = () => {
+          const tips = [
+            { title: "Seja Direto e Claro", description: "Use linguagem simples e evite sarcasmo, ironia ou metáforas que possam ser mal interpretadas. A clareza é fundamental." },
+            { title: "Use Apoios Visuais", description: "Imagens, diagramas ou listas podem ajudar a transmitir informações de forma mais eficaz, especialmente para conceitos abstratos." },
+            { title: "Dê Tempo para Processar", description: "Permita um tempo extra para que a pessoa autista processe o que foi dito e formule uma resposta. Evite interromper." },
+            { title: "Valide Sentimentos", description: "Reconheça e valide as emoções da pessoa, mesmo que você não as compreenda totalmente. Isso cria um ambiente de confiança." },
+            { title: "Evite Sobrecarga Sensorial", description: "Em ambientes com muitos estímulos (barulho, luzes fortes), a comunicação pode ser mais difícil. Procure locais mais calmos." },
+            { title: "Peça Esclarecimentos", description: "Se não tiver certeza do que foi dito, peça para a pessoa repetir ou explicar de outra forma. Isso evita mal-entendidos." },
+            { title: "Foco em um Tópico por Vez", description: "Evite mudar de assunto rapidamente. Mantenha a conversa focada em um tópico até que ele seja completamente abordado." },
+            { title: "Observe Sinais Não-Verbais", description: "Esteja atento a gestos, expressões faciais e postura, mas lembre-se que eles podem ser diferentes ou menos expressivos em pessoas autistas." },
+          ];
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Como Melhorar a Comunicação de Autistas com Não-Autistas</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Dicas e estratégias para promover uma comunicação mais eficaz e compreensiva.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {tips.map((t, i) => (<div key={i} className="bg-blue-50 p-3 sm:p-4 rounded-lg shadow-md">
+                  <h3 className="text-base sm:text-xl font-semibold text-blue-800 mb-1 sm:mb-2">{t.title}</h3><p className="text-xs sm:text-sm text-gray-700">{t.description}</p>
+                </div>))}
+              </div>
+            </div>
+          );
+        };
+
+        const AIHelper = () => {
+          const [difficulty, setDifficulty] = React.useState(''), [youtubeLinks, setYoutubeLinks] = React.useState([]), [loading, setLoading] = React.useState(false), [message, setMessage] = React.useState('');
+          const generateAndFetchLinks = async () => {
+            if (!difficulty.trim()) { setMessage("Descreva sua dificuldade para a IA ajudar."); return; }
+            setLoading(true); setMessage("Gerando sugestões de vídeos..."); setYoutubeLinks([]);
+            try {
+              const prompt = `Gere 3 termos de busca para o YouTube que ajudem uma pessoa com autismo a lidar com a seguinte dificuldade: "${difficulty}". Os termos devem ser focados em atividades ou exercícios práticos. Responda em formato JSON com uma chave "queries" que contém um array de strings.`;
+              const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { "queries": { type: "ARRAY", items: { type: "STRING" } } }, propertyOrdering: ["queries"] } } };
+              const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+              const r = await res.json();
+              if (r.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const queries = JSON.parse(r.candidates[0].content.parts[0].text).queries;
+                if (queries?.length > 0) {
+                  setYoutubeLinks(queries.map(q => ({ title: `Exemplo de vídeo sobre "${q}"`, url: `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}` })));
+                  setMessage("Aqui estão algumas sugestões de vídeos do YouTube:");
+                } else { setMessage("A IA não conseguiu gerar termos de busca relevantes. Tente descrever sua dificuldade de forma diferente."); }
+              } else { setMessage("Erro ao processar a resposta da IA. Tente novamente."); }
+            } catch (e) { console.error("Erro ao gerar links do YouTube:", e); setMessage("Erro ao gerar sugestões. Tente novamente mais tarde."); }
+            finally { setLoading(false); }
+          };
+          return (
+            <div className="p-4 sm:p-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-3 sm:mb-4">Ajuda da Inteligência Artificial ✨</h2>
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">Descreva sua maior dificuldade e a IA irá sugerir vídeos do YouTube para ajudar.</p>
+              <div className="mb-3 sm:mb-4"><label htmlFor="difficulty" className="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Qual é a sua maior dificuldade atualmente?</label><textarea id="difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} placeholder="Ex: Dificuldade em lidar com ambientes barulhentos, problemas para iniciar tarefas, ansiedade social." rows="4" className="shadow border rounded w-full py-1.5 px-2 sm:py-2 sm:px-3 text-gray-700 focus:outline-none focus:shadow-outline text-sm"></textarea></div>
+              <button onClick={generateAndFetchLinks} disabled={loading} className={`px-4 py-2 text-sm sm:px-6 sm:py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'} transition duration-300 w-full`}>{loading ? 'Gerando...' : 'Gerar Sugestões de Vídeos ✨'}</button>
+              {message && <p className="text-center text-xs sm:text-sm text-gray-600 mt-3 sm:mt-4">{message}</p>}
+              {youtubeLinks.length > 0 && (<div className="mt-4 sm:mt-6"><h3 className="text-lg sm:text-xl font-bold text-blue-700 mb-2 sm:mb-3">Vídeos Sugeridos:</h3><ul className="space-y-2 sm:space-y-3">{youtubeLinks.map((l, i) => (<li key={i} className="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-sm"><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline font-semibold text-sm sm:text-base">{l.title}</a></li>))}</ul></div>)}
+            </div>
+          );
+        };
+
+        const App = () => {
+          const [view, setView] = React.useState('home');
+          return (
+            <AppProvider>
+              <div className="min-h-screen bg-blue-100 p-2 sm:p-4 flex flex-col items-center">
+                <Header setView={setView} />
+                <main className="mt-4 w-full max-w-full sm:max-w-4xl">
+                  {view === 'home' && <Home />}
+                  {view === 'binaural' && <BinauralGenerator />}
+                  {view === 'routine' && <DailyRoutine />}
+                  {view === 'selfAssessment' && <SelfAssessment />}
+                  {view === 'soundLibrary' && <SoundLibrary />}
+                  {view === 'userPlaylist' && <UserPlaylist />}
+                  {view === 'communication' && <CommunicationImprovement />}
+                  {view === 'aiHelper' && <AIHelper />}
+                </main>
+              </div>
+            </AppProvider>
+          );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
