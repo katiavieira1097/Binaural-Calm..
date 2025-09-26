@@ -1,1 +1,273 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Voz e a Máquina</title>
+  html
+  <link rel="manifest"
+    href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #00ff41;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 1rem;
+            animation: matrix-bg 30s linear infinite;
+        }
+
+        @keyframes matrix-bg {
+            from { background-position: 0 0; }
+            to { background-position: 100% 100%; }
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff41;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0 20px #00ff41;
+            max-width: 90%;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .status {
+            font-size: 1rem;
+            min-height: 1.5rem;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .control-button {
+            background-color: #00ff41;
+            color: #000;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .control-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #00ff41;
+        }
+
+        .disabled {
+            background-color: #333;
+            color: #888;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .audio-wave {
+            width: 50px;
+            height: 50px;
+            position: relative;
+            background: rgba(0, 255, 65, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .audio-wave span {
+            display: block;
+            background: #00ff41;
+            border-radius: 2px;
+            height: 10px;
+            width: 2px;
+            margin: 0 1px;
+            animation: pulse 1s infinite;
+        }
+
+        .audio-wave span:nth-child(2) { animation-delay: 0.1s; }
+        .audio-wave span:nth-child(3) { animation-delay: 0.2s; }
+        .audio-wave span:nth-child(4) { animation-delay: 0.3s; }
+        .audio-wave span:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0%, 100% { height: 10px; }
+            50% { height: 25px; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #voice-input {
+            background-color: #111;
+            border: 2px solid #00ff41;
+            border-radius: 0.5rem;
+            color: #00ff41;
+            padding: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">A Voz e a Máquina</div>
+        <div class="status" id="status-display">Aguardando comando...</div>
+        
+        <div class="hidden" id="wave-visualizer">
+            <div class="audio-wave">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="control-button" id="record-button">Gravar Pergunta</button>
+            <button class="control-button hidden" id="listen-button">Ouvir Resposta</button>
+            <button class="control-button hidden" id="stop-button">Parar Áudio</button>
+        </div>
+        <audio id="audio-player" class="hidden"></audio>
+    </div>
+
+    <script>
+        // COLE O URL DA SUA FUNÇÃO FIREBASE AQUI
+        const FIREBASE_FUNCTION_URL = "SEU_URL_AQUI";
+
+        const recordButton = document.getElementById('record-button');
+        const listenButton = document.getElementById('listen-button');
+        const stopButton = document.getElementById('stop-button');
+        const statusDisplay = document.getElementById('status-display');
+        const audioPlayer = document.getElementById('audio-player');
+        const waveVisualizer = document.getElementById('wave-visualizer');
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let isPlaying = false;
+
+        async function startRecording() {
+            try {
+                statusDisplay.textContent = 'Ouvindo...';
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                mediaRecorder.onstop = async () => {
+                    waveVisualizer.classList.add('hidden');
+                    statusDisplay.textContent = 'Gerando resposta...';
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioChunks = [];
+                    await sendAudioToFirebase(audioBlob);
+                };
+                audioChunks = [];
+                mediaRecorder.start();
+                isRecording = true;
+                recordButton.textContent = 'Parar Gravação';
+                waveVisualizer.classList.remove('hidden');
+                listenButton.classList.add('hidden');
+            } catch (error) {
+                console.error('Erro ao iniciar a gravação:', error);
+                statusDisplay.textContent = 'Erro ao acessar o microfone.';
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordButton.textContent = 'Gravar Pergunta';
+            }
+        }
+
+        async function sendAudioToFirebase(audioBlob) {
+            try {
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = async () => {
+                    const base64Audio = reader.result.split(',')[1];
+                    const response = await fetch(FIREBASE_FUNCTION_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ audio: base64Audio })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`Erro na rede: ${response.status} - ${errorText}`);
+                    }
+
+                    const data = await response.json();
+                    if (data.audioData) {
+                        const audioUrl = `data:audio/wav;base64,${data.audioData}`;
+                        audioPlayer.src = audioUrl;
+                        audioPlayer.play();
+                        statusDisplay.textContent = 'Reproduzindo...';
+                        isPlaying = true;
+                        listenButton.classList.remove('hidden');
+                        listenButton.textContent = 'Parar Áudio';
+                    } else {
+                        statusDisplay.textContent = 'Erro: Resposta de áudio inválida.';
+                        listenButton.classList.add('hidden');
+                    }
+                };
+            } catch (error) {
+                console.error('Falha na comunicação com o servidor:', error);
+                statusDisplay.textContent = 'Falha na comunicação. Tente novamente.';
+                listenButton.classList.add('hidden');
+                recordButton.classList.remove('disabled');
+            }
+        }
+
+        recordButton.addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+
+        listenButton.addEventListener('click', () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+                listenButton.textContent = 'Ouvir Resposta';
+                statusDisplay.textContent = 'Áudio pausado.';
+            } else {
+                audioPlayer.play();
+                isPlaying = true;
+                listenButton.textContent = 'Parar Áudio';
+                statusDisplay.textContent = 'Reproduzindo...';
+            }
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            isPlaying = false;
+            listenButton.textContent = 'Ouvir Resposta';
+            statusDisplay.textContent = 'Reprodução finalizada. Faça uma nova pergunta.';
+        });
+    </script>
+</body>
+</html>
+
