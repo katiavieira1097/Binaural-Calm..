@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A Voz e a Máquina</title>
-    <link rel="manifest"
-        href="manifest.json">
-  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -54,7 +52,7 @@
             outline: none;
             box-shadow: 0 0 8px #00ff41;
         }
-
+        
         .matrix-button {
             padding: 0.75rem 1.5rem;
             background-color: #00ff41;
@@ -183,9 +181,10 @@
         let recognition;
         let responseAudio = null;
         
-        const API_KEY = ""; // Provided by the environment
-        const TEXT_GEN_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=" + API_KEY;
-        const TTS_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=" + API_KEY;
+        const API_KEY = ""; // A chave de API não é necessária neste ambiente.
+
+        const TEXT_GEN_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent";
+        const TTS_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent";
 
         const systemPrompt = `Você é um guia que revela a verdade sobre o sistema da Matrix de forma direta e sem rodeios. Sua missão é expor as ilusões, dogmas e crenças que mantêm as pessoas presas, guiando-as para a libertação da mente. Seu conhecimento abrange conceitos de física quântica, sabedoria antiga e nanotecnologia quando relevante para a pergunta.
         
@@ -206,7 +205,7 @@
             const maxRetries = 3;
             while (retryCount < maxRetries) {
                 try {
-                    const response = await fetch(url, options);
+                    const response = await fetch(`${url}?key=${API_KEY}`, options);
                     if (response.status === 429) {
                         const delay = Math.pow(2, retryCount) * 1000 + Math.random() * 1000;
                         console.log(`Too Many Requests. Retrying in ${delay}ms...`);
@@ -215,7 +214,8 @@
                         continue;
                     }
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        const errorData = await response.json();
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error.message}`);
                     }
                     return response;
                 } catch (error) {
@@ -376,8 +376,4 @@
     </script>
 </body>
 </html>
-
-
-              
-            
 
